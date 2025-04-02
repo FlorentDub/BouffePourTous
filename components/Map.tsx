@@ -16,15 +16,28 @@ L.Marker.prototype.options.icon = DefaultIcon
 
 export default function Map() {
   const [resources, setResources] = useState<any[]>([])
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const load = async () => {
-      const res = await fetch('/api/ressources')
-      const data = await res.json()
-      setResources(data)
+      try {
+        const res = await fetch('/api/ressources')
+        if (!res.ok) throw new Error(`Erreur serveur: ${res.status}`)
+        const data = await res.json()
+        setResources(data)
+      } catch (err: any) {
+        setError(err.message || 'Une erreur est survenue')
+      } finally {
+        setLoading(false)
+      }
     }
     load()
   }, [])
+
+  if (loading) return <p className="text-center mt-4">Chargement de la carte...</p>
+  if (error) return <p className="text-red-600 text-center mt-4">{error}</p>
+  if (resources.length === 0) return <p className="text-center mt-4">Aucune ressource trouvée pour l’instant.</p>
 
   return (
     <div className="h-[500px] w-full">
