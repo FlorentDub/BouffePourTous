@@ -10,9 +10,9 @@ export default function Home() {
   const [lang, setLang] = useState<'fr' | 'en'>('fr')
 
   return (
-    <main className="min-h-screen bg-[#F8EDEB] text-[#3D2C2C] flex flex-row">
-      {/* Bandeau gauche avec logo, bouton et toggle langue */}
-      <aside className="w-64 bg-white border-r border-[#6B1E1E] p-4 flex flex-col items-center gap-6 shadow-md">
+    <main className="min-h-screen bg-[#F8EDEB] text-[#3D2C2C] flex flex-col md:flex-row">
+      {/* Bandeau latéral ou haut en mobile */}
+      <aside className="w-full md:w-64 bg-white border-b md:border-b-0 md:border-r border-[#6B1E1E] p-4 flex flex-col items-center gap-6 shadow-md">
         <img
           src="/logo.png"
           alt="BouffePourTous / FoodForAll logo"
@@ -25,20 +25,16 @@ export default function Home() {
         </Link>
 
         {/* Toggle langue moderne */}
-        <div className="mt-4">
+        <div className="mt-2">
           <div className="inline-flex items-center rounded-full bg-[#F8EDEB] border border-[#6B1E1E] p-1">
             <button
-              className={`px-3 py-1 rounded-full transition-colors duration-200 text-sm ${
-                lang === 'fr' ? 'bg-[#6B1E1E] text-white' : 'text-[#6B1E1E]'
-              }`}
+              className={`px-3 py-1 rounded-full transition-colors duration-200 text-sm ${lang === 'fr' ? 'bg-[#6B1E1E] text-white' : 'text-[#6B1E1E]'}`}
               onClick={() => setLang('fr')}
             >
               FR
             </button>
             <button
-              className={`px-3 py-1 rounded-full transition-colors duration-200 text-sm ${
-                lang === 'en' ? 'bg-[#6B1E1E] text-white' : 'text-[#6B1E1E]'
-              }`}
+              className={`px-3 py-1 rounded-full transition-colors duration-200 text-sm ${lang === 'en' ? 'bg-[#6B1E1E] text-white' : 'text-[#6B1E1E]'}`}
               onClick={() => setLang('en')}
             >
               EN
