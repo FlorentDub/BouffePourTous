@@ -22,9 +22,22 @@ export async function GET() {
         id: record.id,
         customId: fields.id,
         name_fr: fields.name_fr,
+        name_en: fields.name_en,
+        type_fr: fields.type_fr,
+        type_en: fields.type_en,
         description_fr: fields.description_fr,
+        description_en: fields.description_en,
+        adresse: fields.adresse,
+        ville: fields.ville,
+        code_postal: fields.code_postal,
         latitude: fields.latitude,
         longitude: fields.longitude,
+        horaire_fr: fields.horaire_fr,
+        horaire_en: fields.horaire_en,
+        conditions_fr: fields.conditions_fr,
+        conditions_en: fields.conditions_en,
+        contact: fields.contact,
+        derniere_mise_a_jour: fields.derniere_mise_a_jour,
       }
     })
 
