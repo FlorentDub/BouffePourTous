@@ -9,16 +9,17 @@ export default function AjouterPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [position, setPosition] = useState<[number, number]>([46.8139, -71.2082])
-  const [adresse, setAdresse] = useState('')
+  const [numero, setNumero] = useState('')
+  const [rue, setRue] = useState('')
   const [ville, setVille] = useState('')
   const [codePostal, setCodePostal] = useState('')
   const [geoError, setGeoError] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
 
   useEffect(() => {
-    const fullAddress = `${adresse}, ${ville}, ${codePostal}, Québec, Canada`
+    const fullAddress = `${numero} ${rue}, ${ville}, ${codePostal}, Québec, Canada`
     const timer = setTimeout(async () => {
-      if (adresse || ville || codePostal) {
+      if (numero || rue || ville || codePostal) {
         try {
           const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullAddress)}`)
           const data = await res.json()
@@ -34,7 +35,7 @@ export default function AjouterPage() {
       }
     }, 800)
     return () => clearTimeout(timer)
-  }, [adresse, ville, codePostal])
+  }, [numero, rue, ville, codePostal])
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -132,7 +133,8 @@ export default function AjouterPage() {
           <fieldset className="border border-[#6B1E1E] rounded p-4">
             <legend className="text-lg font-medium text-[#6B1E1E]">Coordonnées</legend>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center mt-4">
-              <label>Adresse</label><input name="adresse" required className="p-2 border rounded bg-white" value={adresse} onChange={e => setAdresse(e.target.value)} />
+              <label>Numéro civique</label><input name="numero" required className="p-2 border rounded bg-white" value={numero} onChange={e => setNumero(e.target.value)} />
+              <label>Rue</label><input name="rue" required className="p-2 border rounded bg-white" value={rue} onChange={e => setRue(e.target.value)} />
               <label>Ville</label><input name="ville" required className="p-2 border rounded bg-white" value={ville} onChange={e => setVille(e.target.value)} />
               <label>Code postal</label><input name="code_postal" required className="p-2 border rounded bg-white" value={codePostal} onChange={e => setCodePostal(e.target.value)} />
               <label>Latitude</label><input name="latitude" value={position[0]} readOnly className="p-2 border rounded bg-gray-200 text-gray-600" />
