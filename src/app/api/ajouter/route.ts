@@ -1,17 +1,10 @@
 import { NextResponse } from 'next/server'
-import Airtable from 'airtable'
-
-const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(
-  process.env.AIRTABLE_BASE_ID || ''
-)
-
-const tableName = process.env.AIRTABLE_TABLE_NAME || 'Ressources alimentaires'
+import { getBase, tableName } from '../../../../lib/airtable'
 
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-
-    const record = await base(tableName).create([
+    const record = await getBase()(tableName).create([
       {
         fields: {
           id: Date.now().toString(),
@@ -36,10 +29,10 @@ export async function POST(req: Request) {
         },
       },
     ])
-
     return NextResponse.json({ success: true, id: record[0].id })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erreur lors de la création Airtable :', error)
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 })
+    const message = error instanceof Error ? error.message : String(error)
+    return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
 }

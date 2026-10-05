@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BouffePourTous / FoodForAll
 
-## Getting Started
+Carte collaborative des ressources alimentaires (banques alimentaires, frigos communautaires, repas) — Next.js + Airtable + Leaflet.
 
-First, run the development server:
+## Démarrage rapide
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Ouvrir [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Variables d'environnement
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Créer un fichier `.env.local` à la racine :
 
-## Learn More
+```
+AIRTABLE_API_KEY=your_key
+AIRTABLE_BASE_ID=your_base_id
+AIRTABLE_TABLE_NAME=Ressources alimentaires
+```
 
-To learn more about Next.js, take a look at the following resources:
+- `AIRTABLE_API_KEY` : clé API Airtable ([doc](https://support.airtable.com/docs/how-do-i-get-my-api-key))
+- `AIRTABLE_BASE_ID` : identifiant de la base (commence par `app...`)
+- `AIRTABLE_TABLE_NAME` : nom de la table (défaut : `Ressources alimentaires`)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Commandes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Commande | Description |
+|---|---|
+| `npm run dev` | Serveur de développement (Turbopack) |
+| `npm run build` | Construit le site pour la production |
+| `npm run start` | Lance le site construit |
+| `npm run lint` | Vérifie la qualité du code |
 
-## Deploy on Vercel
+## Architecture
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `src/app/page.tsx` — page d'accueil avec la carte
+- `src/app/ajouter/` — formulaire de soumission d'une ressource
+- `src/app/api/ressources/` — API GET : ressources validées (Airtable)
+- `src/app/api/ajouter/` — API POST : création d'une ressource (non validée)
+- `components/` — composants carte Leaflet (affichage + sélection)
+- `lib/airtable.ts` — connexion Airtable partagée + mapping des enregistrements
+- `lib/types.ts` — types partagés (`Resource`)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Déploiement
+
+Le plus simple : [Vercel](https://vercel.com/new) (créateurs de Next.js). Configurer les variables d'environnement ci-dessus dans le projet Vercel.
