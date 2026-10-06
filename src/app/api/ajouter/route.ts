@@ -1,8 +1,27 @@
 import { NextResponse } from 'next/server'
 import { getBase, tableName } from '../../../../lib/airtable'
 import { validateNewResource } from '../../../../lib/validation'
+import { rateLimit, getClientIp } from '../../../../lib/rateLimit'
+
+const RATE_LIMIT_MAX = 5
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000
 
 export async function POST(req: Request) {
+  const { allowed, retryAfterSec } = rateLimit(
+    `ajouter:${getClientIp(req)}`,
+    RATE_LIMIT_MAX,
+    RATE_LIMIT_WINDOW_MS
+  )
+  if (!allowed) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: `Trop de soumissions. Réessayez dans ${retryAfterSec} secondes.`,
+      },
+      { status: 429, headers: { 'Retry-After': String(retryAfterSec) } }
+    )
+  }
+
   try {
     let body: unknown
     try {
