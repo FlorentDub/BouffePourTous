@@ -5,12 +5,21 @@ import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 import { useEffect, useState } from 'react'
 import type { Resource } from '../lib/types'
+import { LEGACY_TYPE_MAP } from '../lib/translate'
 
 const DefaultIcon = L.icon({
   iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 })
 L.Marker.prototype.options.icon = DefaultIcon
+
+
+const normalizeType = (value: string | undefined, lang: 'fr' | 'en'): string => {
+  if (!value) return ''
+  const legacy = LEGACY_TYPE_MAP[value]
+  if (legacy) return lang === 'fr' ? legacy.fr : legacy.en
+  return value
+}
 
 const pick = (fr: string | undefined, en: string | undefined) => {
   if (typeof window !== 'undefined') {
@@ -59,7 +68,7 @@ export default function Map({ lang }: { lang: 'fr' | 'en' }) {
             <Popup>
               <div className="text-sm">
                 <strong>{pick(r.name_fr, r.name_en)}</strong><br />
-                <em>{pick(r.type_fr, r.type_en)}</em><br />
+                <em>{normalizeType(pick(r.type_fr, r.type_en), lang)}</em><br />
                 <p className="mt-1">{pick(r.description_fr, r.description_en)}</p>
                 <p className="mt-2">
                   📍 {[r.numero, r.rue].filter(Boolean).join(' ')}<br />
