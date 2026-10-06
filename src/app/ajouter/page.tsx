@@ -39,6 +39,7 @@ export default function AjouterPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    if (loading) return
     setLoading(true)
     setError(null)
 
