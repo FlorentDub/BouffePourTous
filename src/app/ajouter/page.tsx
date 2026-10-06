@@ -29,7 +29,7 @@ export default function AjouterPage() {
           } else {
             setGeoError('Adresse introuvable. Vous pouvez ajuster manuellement le curseur.')
           }
-        } catch (err) {
+        } catch {
           setGeoError("Erreur lors de la géolocalisation.")
         }
       }
@@ -66,8 +66,9 @@ export default function AjouterPage() {
       if (!res.ok) throw new Error('Erreur lors de la soumission.')
 
       setSubmitted(true)
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Erreur lors de la soumission.'
+      setError(message)
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } finally {
       setLoading(false)
@@ -81,7 +82,7 @@ export default function AjouterPage() {
           <img src="/logo.png" alt="BouffePourTous / FoodForAll" className="h-20 mb-4" />
           <Link href="/">
             <button className="bg-[#6B1E1E] text-white px-4 py-2 rounded hover:bg-[#842525]">
-              ← Retour à l'accueil
+              ← Retour à l&apos;accueil
             </button>
           </Link>
         </header>
@@ -96,7 +97,7 @@ export default function AjouterPage() {
         <img src="/logo.png" alt="BouffePourTous / FoodForAll" className="h-20 mb-4" />
         <Link href="/">
           <button className="bg-[#6B1E1E] text-white px-4 py-2 rounded hover:bg-[#842525]">
-            ← Retour à l'accueil
+            ← Retour à l&apos;accueil
           </button>
         </Link>
       </header>

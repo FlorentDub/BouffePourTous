@@ -4,18 +4,16 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 import { useEffect, useState } from 'react'
-
-import iconUrl from 'leaflet/dist/images/marker-icon.png'
-import iconShadow from 'leaflet/dist/images/marker-shadow.png'
+import type { Resource } from '../lib/types'
 
 const DefaultIcon = L.icon({
-  iconUrl,
-  shadowUrl: iconShadow,
+  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 })
 L.Marker.prototype.options.icon = DefaultIcon
 
 export default function Map({ lang }: { lang: 'fr' | 'en' }) {
-  const [resources, setResources] = useState<any[]>([])
+  const [resources, setResources] = useState<Resource[]>([])
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -26,8 +24,9 @@ export default function Map({ lang }: { lang: 'fr' | 'en' }) {
         if (!res.ok) throw new Error(`Erreur serveur: ${res.status}`)
         const data = await res.json()
         setResources(data)
-      } catch (err: any) {
-        setError(err.message || 'Une erreur est survenue')
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Une erreur est survenue'
+        setError(message)
       } finally {
         setLoading(false)
       }
