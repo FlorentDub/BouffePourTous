@@ -29,7 +29,7 @@ export async function POST(req: Request) {
     const record = await getBase()(tableName).create([
       {
         fields: {
-          id: Date.now().toString(),
+          id: crypto.randomUUID(),
           name_fr: input.name_fr,
           name_en: input.name_en,
           type_fr: input.type_fr,
