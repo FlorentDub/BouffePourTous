@@ -138,6 +138,7 @@ export default function AjouterPage() {
               <label>Rue</label><input name="rue" required className="p-2 border rounded bg-white" value={rue} onChange={e => setRue(e.target.value)} />
               <label>Ville</label><input name="ville" required className="p-2 border rounded bg-white" value={ville} onChange={e => setVille(e.target.value)} />
               <label>Code postal</label><input name="code_postal" required className="p-2 border rounded bg-white" value={codePostal} onChange={e => setCodePostal(e.target.value)} />
+              <label>Contact (lien web, optionnel)</label><input name="contact" type="url" placeholder="https://..." className="p-2 border rounded bg-white" />
               <label>Latitude</label><input name="latitude" value={position[0]} readOnly className="p-2 border rounded bg-gray-200 text-gray-600" />
               <label>Longitude</label><input name="longitude" value={position[1]} readOnly className="p-2 border rounded bg-gray-200 text-gray-600" />
             </div>
