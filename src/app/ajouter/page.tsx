@@ -157,7 +157,15 @@ export default function AjouterPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       })
-      if (!res.ok) throw new Error('Erreur lors de la soumission.')
+      const result = await res.json().catch(() => null)
+      if (!res.ok) {
+        const serverMessage = result?.error
+        throw new Error(
+          typeof serverMessage === 'string' && serverMessage
+            ? serverMessage
+            : `Erreur ${res.status} lors de la soumission.`
+        )
+      }
       setSubmitted(true)
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Erreur lors de la soumission.'
