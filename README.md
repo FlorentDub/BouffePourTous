@@ -98,7 +98,7 @@ Pas développeur ? Vous pouvez aussi aider en **soumettant des ressources** via 
 
 ## 📄 Licence
 
-À définir par le propriétaire du projet (suggestion : [MIT](https://opensource.org/licenses/MIT) pour une adoption libre).
+Ce projet est sous licence [MIT](LICENSE).
 
 ---
 
