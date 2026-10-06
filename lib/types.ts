@@ -7,7 +7,8 @@ export type Resource = {
   type_en: string
   description_fr: string
   description_en: string
-  adresse: string
+  numero: string
+  rue: string
   ville: string
   code_postal: string
   latitude: number
