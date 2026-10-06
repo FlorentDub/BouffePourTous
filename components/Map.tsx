@@ -12,6 +12,15 @@ const DefaultIcon = L.icon({
 })
 L.Marker.prototype.options.icon = DefaultIcon
 
+const pick = (fr: string | undefined, en: string | undefined) => {
+  if (typeof window !== 'undefined') {
+    const lang = document.documentElement.lang
+    if (lang === 'en') return en || fr
+  }
+  return fr || en
+}
+
+
 export default function Map({ lang }: { lang: 'fr' | 'en' }) {
   const [resources, setResources] = useState<Resource[]>([])
   const [error, setError] = useState<string | null>(null)
@@ -49,13 +58,13 @@ export default function Map({ lang }: { lang: 'fr' | 'en' }) {
           <Marker key={r.id} position={[r.latitude, r.longitude]}>
             <Popup>
               <div className="text-sm">
-                <strong>{lang === 'fr' ? r.name_fr : r.name_en}</strong><br />
-                <em>{lang === 'fr' ? r.type_fr : r.type_en}</em><br />
-                <p className="mt-1">{lang === 'fr' ? r.description_fr : r.description_en}</p>
+                <strong>{pick(r.name_fr, r.name_en)}</strong><br />
+                <em>{pick(r.type_fr, r.type_en)}</em><br />
+                <p className="mt-1">{pick(r.description_fr, r.description_en)}</p>
                 <p className="mt-2">
                   📍 {r.adresse}<br />
-                  🕒 {lang === 'fr' ? r.horaire_fr : r.horaire_en}<br />
-                  🛂 {lang === 'fr' ? r.conditions_fr : r.conditions_en}<br />
+                  🕒 {pick(r.horaire_fr, r.horaire_en)}<br />
+                  🚪 {pick(r.conditions_fr, r.conditions_en)}<br />
                   🔗 {r.contact && (
                     <a href={r.contact} target="_blank" rel="noopener noreferrer" className="underline text-blue-600">
                       {lang === 'fr' ? 'Voir le lien' : 'View link'}

@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server'
 import { getBase, tableName } from '../../../../lib/airtable'
 import { validateNewResource } from '../../../../lib/validation'
+import { translateResource } from '../../../../lib/translate'
 import { rateLimit, getClientIp } from '../../../../lib/rateLimit'
+import type { Resource } from '../../../../lib/types'
 
 const RATE_LIMIT_MAX = 5
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000
@@ -45,26 +47,55 @@ export async function POST(req: Request) {
       )
     }
 
+    const apiKey = process.env.DEEPL_API_KEY
+    let final = input
+    if (apiKey) {
+      const asResource = {
+        id: '', customId: '',
+        name_fr: input.name_fr, name_en: input.name_en,
+        type_fr: input.type_fr, type_en: input.type_en,
+        description_fr: input.description_fr, description_en: input.description_en,
+        adresse: input.adresse, ville: input.ville, code_postal: input.code_postal,
+        latitude: input.latitude, longitude: input.longitude,
+        horaire_fr: input.horaire_fr, horaire_en: input.horaire_en,
+        conditions_fr: input.conditions_fr, conditions_en: input.conditions_en,
+        contact: input.contact ?? '',
+        derniere_mise_a_jour: '',
+      } satisfies Resource
+      const translated = await translateResource(asResource, apiKey)
+      final = {
+        ...input,
+        name_fr: translated.name_fr || input.name_fr,
+        name_en: translated.name_en || input.name_en,
+        description_fr: translated.description_fr || input.description_fr,
+        description_en: translated.description_en || input.description_en,
+        horaire_fr: translated.horaire_fr || input.horaire_fr,
+        horaire_en: translated.horaire_en || input.horaire_en,
+        conditions_fr: translated.conditions_fr || input.conditions_fr,
+        conditions_en: translated.conditions_en || input.conditions_en,
+      }
+    }
+
     const record = await getBase()(tableName).create([
       {
         fields: {
           id: crypto.randomUUID(),
-          name_fr: input.name_fr,
-          name_en: input.name_en,
-          type_fr: input.type_fr,
-          type_en: input.type_en,
-          description_fr: input.description_fr,
-          description_en: input.description_en,
-          adresse: input.adresse,
-          ville: input.ville,
-          code_postal: input.code_postal,
-          latitude: input.latitude,
-          longitude: input.longitude,
-          horaire_fr: input.horaire_fr,
-          horaire_en: input.horaire_en,
-          conditions_fr: input.conditions_fr,
-          conditions_en: input.conditions_en,
-          contact: input.contact ?? '',
+          name_fr: final.name_fr,
+          name_en: final.name_en,
+          type_fr: final.type_fr,
+          type_en: final.type_en,
+          description_fr: final.description_fr,
+          description_en: final.description_en,
+          adresse: final.adresse,
+          ville: final.ville,
+          code_postal: final.code_postal,
+          latitude: final.latitude,
+          longitude: final.longitude,
+          horaire_fr: final.horaire_fr,
+          horaire_en: final.horaire_en,
+          conditions_fr: final.conditions_fr,
+          conditions_en: final.conditions_en,
+          contact: final.contact ?? '',
           valide: false,
           derniere_mise_a_jour: new Date().toISOString(),
         },
