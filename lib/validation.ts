@@ -10,7 +10,8 @@ export type NewResourceInput = {
   type_en: string
   description_fr: string
   description_en: string
-  adresse: string
+  numero: string
+  rue: string
   ville: string
   code_postal: string
   latitude: number
@@ -76,7 +77,8 @@ export const validateNewResource = (
     type_en: type.en,
     description_fr: (fr ? description : descriptionOther) ?? '',
     description_en: (fr ? descriptionOther : description) ?? '',
-    adresse: `${numero} ${rue}`,
+    numero,
+    rue,
     ville,
     code_postal: codePostal,
     latitude,

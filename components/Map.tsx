@@ -62,7 +62,7 @@ export default function Map({ lang }: { lang: 'fr' | 'en' }) {
                 <em>{pick(r.type_fr, r.type_en)}</em><br />
                 <p className="mt-1">{pick(r.description_fr, r.description_en)}</p>
                 <p className="mt-2">
-                  📍 {r.adresse}<br />
+                  📍 {[r.numero, r.rue].filter(Boolean).join(' ')}<br />
                   🕒 {pick(r.horaire_fr, r.horaire_en)}<br />
                   🚪 {pick(r.conditions_fr, r.conditions_en)}<br />
                   🔗 {r.contact && (
