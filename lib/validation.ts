@@ -1,4 +1,9 @@
+import { TYPE_MAP } from './translate'
+
+export type SourceLang = 'fr' | 'en'
+
 export type NewResourceInput = {
+  sourceLang: SourceLang
   name_fr: string
   name_en: string
   type_fr: string
@@ -17,64 +22,70 @@ export type NewResourceInput = {
   contact?: string
 }
 
-const TEXT_FIELDS = [
-  'name_fr',
-  'name_en',
-  'type_fr',
-  'type_en',
-  'description_fr',
-  'description_en',
-  'adresse',
-  'ville',
-  'code_postal',
-  'horaire_fr',
-  'horaire_en',
-  'conditions_fr',
-  'conditions_en',
-] as const
-
-const TYPES_FR = ['Banque alimentaire', 'Frigo', 'Repas', 'Autre']
-const TYPES_EN = ['Food bank', 'Fridge', 'Meal', 'Other']
-
 const MAX_TEXT_LENGTH = 2000
 
-export const validateNewResource = (body: unknown): NewResourceInput | null => {
+const str = (v: unknown): string | null =>
+  typeof v === 'string' && v.trim().length > 0 ? v : null
+
+export const validateNewResource = (
+  body: unknown
+): NewResourceInput | null => {
   if (typeof body !== 'object' || body === null) return null
   const b = body as Record<string, unknown>
 
-  for (const field of TEXT_FIELDS) {
-    const value = b[field]
-    if (typeof value !== 'string' || value.trim().length === 0) return null
-    if (value.length > MAX_TEXT_LENGTH) return null
-  }
+  const sourceLang: SourceLang = b.sourceLang === 'en' ? 'en' : 'fr'
 
-  if (!TYPES_FR.includes(b.type_fr as string) || !TYPES_EN.includes(b.type_en as string)) return null
+  const name = str(b.name)
+  const description = str(b.description)
+  const horaire = str(b.horaire)
+  const conditions = str(b.conditions)
+  const numero = str(b.numero)
+  const rue = str(b.rue)
+  const ville = str(b.ville)
+  const codePostal = str(b.code_postal)
+  const typeKey = str(b.type_key)
 
-  if (b.contact !== undefined && b.contact !== '') {
-    if (typeof b.contact !== 'string' || b.contact.length > 500) return null
-  }
+  if (!name || !description || !horaire || !conditions) return null
+  if (!numero || !rue || !ville || !codePostal) return null
+  if (!typeKey || !(typeKey in TYPE_MAP)) return null
+
+  if ([name, description, horaire, conditions].some((v) => v.length > MAX_TEXT_LENGTH)) return null
+
+  const nameOther = str(b[`name_${sourceLang === 'fr' ? 'en' : 'fr'}`])
+  const descriptionOther = str(b[`description_${sourceLang === 'fr' ? 'en' : 'fr'}`])
+  const horaireOther = str(b[`horaire_${sourceLang === 'fr' ? 'en' : 'fr'}`])
+  const conditionsOther = str(b[`conditions_${sourceLang === 'fr' ? 'en' : 'fr'}`])
+  if ([nameOther, descriptionOther, horaireOther, conditionsOther].some((v) => v !== null && v.length > MAX_TEXT_LENGTH)) return null
 
   const latitude = Number(b.latitude)
   const longitude = Number(b.longitude)
   if (!Number.isFinite(latitude) || latitude < -90 || latitude > 90) return null
   if (!Number.isFinite(longitude) || longitude < -180 || longitude > 180) return null
 
-  return {
-    name_fr: b.name_fr as string,
-    name_en: b.name_en as string,
-    type_fr: b.type_fr as string,
-    type_en: b.type_en as string,
-    description_fr: b.description_fr as string,
-    description_en: b.description_en as string,
-    adresse: b.adresse as string,
-    ville: b.ville as string,
-    code_postal: b.code_postal as string,
+  if (b.contact !== undefined && b.contact !== '') {
+    if (typeof b.contact !== 'string' || b.contact.length > 500) return null
+  }
+
+  const type = TYPE_MAP[typeKey]
+  const fr = sourceLang === 'fr'
+  const input: NewResourceInput = {
+    sourceLang,
+    name_fr: (fr ? name : nameOther) ?? '',
+    name_en: (fr ? nameOther : name) ?? '',
+    type_fr: type.fr,
+    type_en: type.en,
+    description_fr: (fr ? description : descriptionOther) ?? '',
+    description_en: (fr ? descriptionOther : description) ?? '',
+    adresse: `${numero} ${rue}`,
+    ville,
+    code_postal: codePostal,
     latitude,
     longitude,
-    horaire_fr: b.horaire_fr as string,
-    horaire_en: b.horaire_en as string,
-    conditions_fr: b.conditions_fr as string,
-    conditions_en: b.conditions_en as string,
+    horaire_fr: (fr ? horaire : horaireOther) ?? '',
+    horaire_en: (fr ? horaireOther : horaire) ?? '',
+    conditions_fr: (fr ? conditions : conditionsOther) ?? '',
+    conditions_en: (fr ? conditionsOther : conditions) ?? '',
     contact: typeof b.contact === 'string' ? b.contact : undefined,
   }
+  return input
 }
