@@ -10,10 +10,22 @@ Le travail agentique sur ce projet suit des rôles nommés :
 - **Tech Lead** : transforme les besoins en issues GitHub précises et indépendantes (contexte, fichiers, critère de réussite).
 - **Développeur** : écrit le code, ouvre une Pull Request par ticket.
 - **QA** : revue de code, vérification, rapport d'anomalies avec priorités.
+- **UI & Accessibilité** : veille à ce que toute modification d'interface soit simple, intuitive et accessible (handicaps visuels, lecteurs d'écran, navigation clavier, contrastes). Toute PR touchant l'UI passe par sa revue.
 - **DevOps** : CI, déploiement, secrets.
 - **Product Owner** (l'humain) : priorités, validation, fusion des PR.
 
-Boucle standard : besoin → issue (Tech Lead) → code (Développeur) → CI automatique → revue (QA) → validation/fusion (PO).
+Boucle standard : besoin → issue (Tech Lead) → code (Développeur) → CI automatique → revue (QA + UI si l'interface est touchée) → validation/fusion (PO).
+
+### Règles UI & accessibilité (permanent — l'agent UI les fait respecter)
+
+- **Tout le monde doit pouvoir utiliser le site** : handicaps visuels, lecteurs d'écran, zoom, navigation clavier.
+- Chaque champ de formulaire a un `<label>` lié (`htmlFor`/`id`), pas un label orphelin.
+- Contrastes de couleurs conformes WCAG AA (texte ≥ 4.5:1, grands textes ≥ 3:1).
+- Boutons et liens identifiables au clavier (`:focus-visible`), ordre de tabulation logique.
+- Textes alternatifs (`alt`) sur toutes les images porteuses de sens.
+- Langue de la page cohérente (`lang` mis à jour au changement de langue).
+- Simplicité d'abord : si une interface demande des explications, elle est trop complexe.
+- Les vérifications automatiques possibles (labels, alt, contrastes) sont à ajouter à la CI quand un outil adapté est introduit ; l'agent UI fait la revue manuelle du reste.
 
 ## Stack
 
