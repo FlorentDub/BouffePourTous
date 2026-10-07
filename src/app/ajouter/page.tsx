@@ -97,6 +97,10 @@ const LABELS = {
 
 export default function AjouterPage() {
   const [lang, setLang] = useState<'fr' | 'en'>('fr')
+
+  useEffect(() => {
+    document.documentElement.lang = lang
+  }, [lang])
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
