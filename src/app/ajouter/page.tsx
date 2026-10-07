@@ -229,41 +229,41 @@ export default function AjouterPage() {
           </div>
         </div>
 
-        {error && <p className="text-red-600 mb-2">{error}</p>}
+        {error && <p id="form-error" role="alert" className="text-red-600 mb-2">{error}</p>}
 
-        <form onSubmit={handleSubmit} className="space-y-8" noValidate>
+        <form onSubmit={handleSubmit} className="space-y-8" noValidate aria-describedby={error ? "form-error" : undefined}>
           <fieldset className="border border-[#6B1E1E] rounded p-4">
             <legend className="text-lg font-medium text-[#6B1E1E]">{t.legend}</legend>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center mt-4">
-              <label>{t.name}</label>
-              <input name="name" required placeholder={t.namePh} className={inputClass} />
-              <label>{t.type}</label>
-              <select name="type_key" required className={inputClass} defaultValue="">
+              <label htmlFor="name">{t.name}</label>
+              <input name="name" id="name" required placeholder={t.namePh} className={inputClass} />
+              <label htmlFor="type">{t.type}</label>
+              <select name="type_key" id="type" required className={inputClass} defaultValue="">
                 <option value="" disabled>{lang === 'fr' ? 'Sélectionnez' : 'Select'}</option>
                 {Object.entries(t.typeOptions).map(([key, label]) => (
                   <option key={key} value={key}>{label}</option>
                 ))}
               </select>
-              <label>{t.description}</label>
-              <textarea name="description" required placeholder={t.descriptionPh} className={inputClass} />
+              <label htmlFor="description">{t.description}</label>
+              <textarea name="description" id="description" required placeholder={t.descriptionPh} className={inputClass} />
             </div>
           </fieldset>
 
           <fieldset className="border border-[#6B1E1E] rounded p-4">
             <legend className="text-lg font-medium text-[#6B1E1E]">{t.legendCoord}</legend>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center mt-4">
-              <label>{t.numero}</label>
-              <input name="numero" required placeholder={t.numeroPh} value={numero} onChange={e => setNumero(e.target.value)} className={inputClass} />
-              <label>{t.rue}</label>
-              <input name="rue" required placeholder={t.ruePh} value={rue} onChange={e => setRue(e.target.value)} className={inputClass} />
-              <label>{t.ville}</label>
-              <input name="ville" required placeholder={t.villePh} value={ville} onChange={e => setVille(e.target.value)} className={inputClass} />
-              <label>{t.codePostal}</label>
-              <input name="code_postal" required placeholder={t.codePostalPh} value={codePostal} onChange={e => setCodePostal(e.target.value)} className={inputClass} />
-              <label>{t.latitude}</label>
-              <input name="latitude" value={position[0]} readOnly className="p-2 border rounded bg-gray-200 text-gray-600" />
-              <label>{t.longitude}</label>
-              <input name="longitude" value={position[1]} readOnly className="p-2 border rounded bg-gray-200 text-gray-600" />
+              <label htmlFor="numero">{t.numero}</label>
+              <input name="numero" id="numero" required placeholder={t.numeroPh} value={numero} onChange={e => setNumero(e.target.value)} className={inputClass} />
+              <label htmlFor="rue">{t.rue}</label>
+              <input name="rue" id="rue" required placeholder={t.ruePh} value={rue} onChange={e => setRue(e.target.value)} className={inputClass} />
+              <label htmlFor="ville">{t.ville}</label>
+              <input name="ville" id="ville" required placeholder={t.villePh} value={ville} onChange={e => setVille(e.target.value)} className={inputClass} />
+              <label htmlFor="code-postal">{t.codePostal}</label>
+              <input name="code_postal" id="code-postal" required placeholder={t.codePostalPh} value={codePostal} onChange={e => setCodePostal(e.target.value)} className={inputClass} />
+              <label htmlFor="latitude">{t.latitude}</label>
+              <input name="latitude" id="latitude" value={position[0]} readOnly className="p-2 border rounded bg-gray-200 text-gray-600" />
+              <label htmlFor="longitude">{t.longitude}</label>
+              <input name="longitude" id="longitude" value={position[1]} readOnly className="p-2 border rounded bg-gray-200 text-gray-600" />
             </div>
             {geoError && <p className="text-red-600 text-sm mt-2">{geoError}</p>}
             <MapSelector position={position} setPosition={setPosition} />
@@ -272,12 +272,12 @@ export default function AjouterPage() {
           <fieldset className="border border-[#6B1E1E] rounded p-4">
             <legend className="text-lg font-medium text-[#6B1E1E]">{t.legendHoraires}</legend>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center mt-4">
-              <label>{t.horaire}</label>
-              <input name="horaire" required placeholder={t.horairePh} className={inputClass} />
-              <label>{t.conditions}</label>
-              <input name="conditions" required placeholder={t.conditionsPh} className={inputClass} />
-              <label>{t.contact}</label>
-              <input name="contact" type="url" placeholder={t.contactPh} className={inputClass} />
+              <label htmlFor="horaire">{t.horaire}</label>
+              <input name="horaire" id="horaire" required placeholder={t.horairePh} className={inputClass} />
+              <label htmlFor="conditions">{t.conditions}</label>
+              <input name="conditions" id="conditions" required placeholder={t.conditionsPh} className={inputClass} />
+              <label htmlFor="contact">{t.contact}</label>
+              <input name="contact" id="contact" type="url" placeholder={t.contactPh} className={inputClass} />
             </div>
           </fieldset>
 
@@ -293,14 +293,14 @@ export default function AjouterPage() {
               <fieldset className="border border-[#6B1E1E] rounded p-4 mt-4">
                 <legend className="text-sm font-medium text-[#6B1E1E]">{t.otherLang}</legend>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center mt-4">
-                  <label>{t.nameEn}</label>
-                  <input name={`name_${lang === 'fr' ? 'en' : 'fr'}`} className={inputClass} />
-                  <label>{t.descriptionEn}</label>
-                  <textarea name={`description_${lang === 'fr' ? 'en' : 'fr'}`} className={inputClass} />
-                  <label>{t.horaireEn}</label>
-                  <input name={`horaire_${lang === 'fr' ? 'en' : 'fr'}`} className={inputClass} />
-                  <label>{t.conditionsEn}</label>
-                  <input name={`conditions_${lang === 'fr' ? 'en' : 'fr'}`} className={inputClass} />
+                  <label htmlFor="name_other">{t.nameEn}</label>
+                  <input id="name_other" name={`name_${lang === 'fr' ? 'en' : 'fr'}`} className={inputClass} />
+                  <label htmlFor="description_other">{t.descriptionEn}</label>
+                  <textarea id="description_other" name={`description_${lang === 'fr' ? 'en' : 'fr'}`} className={inputClass} />
+                  <label htmlFor="horaire_other">{t.horaireEn}</label>
+                  <input id="horaire_other" name={`horaire_${lang === 'fr' ? 'en' : 'fr'}`} className={inputClass} />
+                  <label htmlFor="conditions_other">{t.conditionsEn}</label>
+                  <input id="conditions_other" name={`conditions_${lang === 'fr' ? 'en' : 'fr'}`} className={inputClass} />
                 </div>
               </fieldset>
             )}
