@@ -2,12 +2,16 @@
 
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const Map = dynamic(() => import('../../components/Map'), { ssr: false })
 
 export default function Home() {
   const [lang, setLang] = useState<'fr' | 'en'>('fr')
+
+  useEffect(() => {
+    document.documentElement.lang = lang
+  }, [lang])
 
   return (
     <main className="min-h-screen bg-[#F8EDEB] text-[#3D2C2C] flex flex-col md:flex-row">
