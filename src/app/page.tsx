@@ -12,7 +12,6 @@ export default function Home() {
   useEffect(() => {
     document.documentElement.lang = lang
   }, [lang])
-
   return (
     <main className="min-h-screen bg-[#F8EDEB] text-[#3D2C2C] flex flex-col">
       <header className="bg-white border-b border-[#6B1E1E]">
