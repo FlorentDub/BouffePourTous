@@ -42,6 +42,24 @@ test.describe('Carte Leaflet', () => {
             conditions_fr: 'Aucune',
             conditions_en: 'None',
           },
+          {
+            id: 'e2e-2',
+            name_fr: 'Banque de test',
+            name_en: 'Test bank',
+            type_fr: 'Banque alimentaire',
+            type_en: 'Food bank',
+            description_fr: 'Banque test',
+            description_en: 'Test bank',
+            numero: '456',
+            rue: 'rue Saint-Paul',
+            ville: 'Québec',
+            latitude: 46.8140,
+            longitude: -71.2083,
+            horaire_fr: '9h-17h',
+            horaire_en: '9am-5pm',
+            conditions_fr: 'Aucune',
+            conditions_en: 'None',
+          },
         ]),
       })
     )
@@ -98,5 +116,66 @@ test.describe('Carte Leaflet', () => {
     const alert = page.locator('div.relative > p[role="alert"]')
     await expect(alert).toBeVisible()
     expect(overlap(await bbox(alert), await bbox(locate))).toBe(false)
+  })
+})
+
+test.describe('Filtre par type', () => {
+  test('les boutons de filtre affichent les compteurs et filtrent les marqueurs', async ({ page }) => {
+    await page.route('**/api/ressources', (route) =>
+      route.fulfill({
+        contentType: 'application/json',
+        body: JSON.stringify([
+          {
+            id: 'e2e-1',
+            name_fr: 'Frigo de test',
+            name_en: 'Test fridge',
+            type_fr: 'Frigo communautaire',
+            type_en: 'Community fridge',
+            description_fr: 'Frigo test',
+            description_en: 'Test fridge',
+            numero: '123',
+            rue: 'rue Saint-Joseph',
+            ville: 'Québec',
+            latitude: 46.8139,
+            longitude: -71.2082,
+            horaire_fr: '24/7',
+            horaire_en: '24/7',
+            conditions_fr: 'Aucune',
+            conditions_en: 'None',
+          },
+          {
+            id: 'e2e-2',
+            name_fr: 'Banque de test',
+            name_en: 'Test bank',
+            type_fr: 'Banque alimentaire',
+            type_en: 'Food bank',
+            description_fr: 'Banque test',
+            description_en: 'Test bank',
+            numero: '456',
+            rue: 'rue Saint-Paul',
+            ville: 'Québec',
+            latitude: 46.8140,
+            longitude: -71.2083,
+            horaire_fr: '9h-17h',
+            horaire_en: '9am-5pm',
+            conditions_fr: 'Aucune',
+            conditions_en: 'None',
+          },
+        ]),
+      })
+    )
+    await page.goto('/')
+    await expect(page.locator('.leaflet-container')).toBeVisible()
+    const markers = page.locator('.leaflet-marker-icon')
+    await expect(markers).toHaveCount(2)
+
+    const filtreBanque = page.getByRole('button', { name: /Banque alimentaire/ })
+    await expect(filtreBanque).toBeVisible()
+    await filtreBanque.click()
+    await expect(markers).toHaveCount(1)
+
+    const filtreTous = page.getByRole('button', { name: /^Tous/ })
+    await filtreTous.click()
+    await expect(markers).toHaveCount(2)
   })
 })
