@@ -1,0 +1,38 @@
+name: Auto-merge
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, ready_for_review]
+  pull_request_review:
+    types: [submitted]
+  check_suite:
+    types: [completed]
+  status: {}
+
+concurrency:
+  group: auto-merge-${{ github.event.pull_request.number || github.event.check_suite.head_sha }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: read
+
+jobs:
+  auto-merge:
+    name: Fusion automatique
+    runs-on: ubuntu-latest
+    if: >
+      github.event.pull_request.draft == false &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - name: Attendre et fusionner si possible
+        uses: pascalgn/automerge-action@v1.2.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.AUTO_MERGE_TOKEN }}
+          MERGE_METHOD: merge
+          MERGE_REMOVE_LABELS: automerge
+          MERGE_COMMIT_MESSAGE: pull-request-title
+          MERGE_FORKS: false
+          MERGE_DELETE_BRANCH_ON_CLOSE: false
+          UPDATE_METHOD: rebase
