@@ -25,7 +25,7 @@ jobs:
         run: npm ci --no-audit --no-fund
 
       - name: Audit securite dependances
-        run: npm audit --omit=dev --audit-level=critical || echo "Vulnerabilites existantes tracees dans le ticket #34"
+        run: npm audit --omit=dev --audit-level=critical || echo "Vulnerabilites existantes tracees dans le ticket 34"
       - name: Lint
         run: npm run lint
 
