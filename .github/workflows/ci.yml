@@ -29,8 +29,6 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Vérification des types
-        run: npx tsc --noEmit
 
       - name: Build
         run: npm run build
@@ -38,6 +36,8 @@ jobs:
           AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
           AIRTABLE_BASE_ID: ${{ secrets.AIRTABLE_BASE_ID }}
           AIRTABLE_TABLE_NAME: ${{ secrets.AIRTABLE_TABLE_NAME }}
+      - name: Vérification des types
+        run: npx tsc --noEmit
 
   e2e:
     name: Tests E2E (rendu reel)
@@ -59,6 +59,8 @@ jobs:
           AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
           AIRTABLE_BASE_ID: ${{ secrets.AIRTABLE_BASE_ID }}
           AIRTABLE_TABLE_NAME: ${{ secrets.AIRTABLE_TABLE_NAME }}
+      - name: Vérification des types
+        run: npx tsc --noEmit
       - name: Tests E2E
         run: npx playwright test
         env:
