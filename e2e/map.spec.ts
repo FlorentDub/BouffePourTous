@@ -95,7 +95,7 @@ test.describe('Carte Leaflet', () => {
     await page.goto('/')
     const locate = page.locator('.leaflet-control-locate')
     await locate.click()
-    const alert = page.locator('[role="alert"]')
+    const alert = page.locator('.h-\[500px\] [role="alert"]')
     await expect(alert).toBeVisible()
     expect(overlap(await bbox(alert), await bbox(locate))).toBe(false)
   })
