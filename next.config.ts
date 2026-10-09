@@ -22,7 +22,7 @@ const securityHeaders = [
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline'",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://*.tile.openstreetmap.org https://unpkg.com",
+      "img-src 'self' data: blob: https://*.tile.openstreetmap.org",
       "connect-src 'self' https://api-free.deepl.com",
       "font-src 'self'",
       "object-src 'none'",
@@ -42,14 +42,6 @@ const nextConfig = {
         headers: securityHeaders,
       },
     ]
-  },
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'unpkg.com',
-      },
-    ],
   },
 }
 

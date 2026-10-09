@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import MapSelector from '../../../components/MapSelector'
 
@@ -184,7 +185,7 @@ export default function AjouterPage() {
     return (
       <div className="min-h-screen bg-cream text-ink min-h-screen px-4 py-8 md:px-6">
         <header className="max-w-2xl mx-auto flex items-center justify-between gap-4 mb-10">
-          <img src="/logo.png" alt="BouffePourTous / FoodForAll" className="h-12 md:h-16" />
+          <Image src="/logo.png" alt="BouffePourTous / FoodForAll" width={140} height={64} className="h-12 md:h-16 w-auto" />
           <Link href="/">
             <button className="bg-white text-primary font-medium px-4 py-2 rounded-full border border-line hover:bg-primary-soft transition-colors">
               ← {t.backHome}
@@ -201,7 +202,7 @@ export default function AjouterPage() {
   return (
     <div className="min-h-screen bg-cream text-ink min-h-screen px-4 py-8 md:px-6">
       <header className="max-w-2xl mx-auto flex items-center justify-between gap-4 mb-10">
-        <img src="/logo.png" alt="BouffePourTous / FoodForAll" className="h-12 md:h-16" />
+        <Image src="/logo.png" alt="BouffePourTous / FoodForAll" width={140} height={64} className="h-12 md:h-16 w-auto" />
         <Link href="/">
           <button className="bg-white text-primary font-medium px-4 py-2 rounded-full border border-line hover:bg-primary-soft transition-colors">
             ← {t.backHome}
