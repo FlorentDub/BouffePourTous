@@ -27,7 +27,7 @@ jobs:
       github.event.pull_request.head.repo.full_name == github.repository
     steps:
       - name: Attendre et fusionner si possible
-        uses: pascalgn/automerge-action@v1.2.0
+        uses: pascalgn/automerge-action@v0.9.0
         env:
           GITHUB_TOKEN: ${{ secrets.AUTO_MERGE_TOKEN }}
           MERGE_METHOD: merge
