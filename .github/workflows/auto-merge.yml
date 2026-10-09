@@ -3,36 +3,71 @@ name: Auto-merge
 on:
   pull_request_target:
     types: [opened, reopened, synchronize, ready_for_review]
-  pull_request_review:
-    types: [submitted]
   check_suite:
     types: [completed]
-  status: {}
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: read
 
 concurrency:
   group: auto-merge-${{ github.event.pull_request.number || github.event.check_suite.head_sha }}
   cancel-in-progress: true
 
-permissions:
-  contents: write
-  pull-requests: write
-  checks: read
-
 jobs:
-  auto-merge:
+  merge:
     name: Fusion automatique
     runs-on: ubuntu-latest
-    if: >
-      github.event.pull_request.draft == false &&
-      github.event.pull_request.head.repo.full_name == github.repository
+    env:
+      REPO: ${{ github.repository }}
+      GH_TOKEN: ${{ github.token }}
     steps:
-      - name: Attendre et fusionner si possible
-        uses: pascalgn/automerge-action@v0.9.0
+      - name: Identifier la PR
+        id: pr
+        run: |
+          PR="${{ github.event.pull_request.number }}"
+          if [ -z "$PR" ]; then
+            SHA="${{ github.event.check_suite.head_sha }}"
+            PR=$(gh pr list --repo "$REPO" --state open --json number,headRefOid --jq ".[] | select(.headRefOid == \"$SHA\") | .number" | head -n1)
+          fi
+          echo "number=$PR" >> "$GITHUB_OUTPUT"
+
+      - name: Attendre la fin des checks
+        id: checks
+        if: steps.pr.outputs.number != ''
+        run: |
+          PR="${{ steps.pr.outputs.number }}"
+          OUT_OK=0
+          for i in $(seq 1 40); do
+            OUT=$(gh pr checks "$PR" --repo "$REPO" 2>/dev/null | grep -v "Fusion automatique" || true)
+            if [ -n "$OUT" ] && ! echo "$OUT" | grep -qE "pending|queued|in_progress"; then
+              if echo "$OUT" | grep -q "fail"; then
+                OUT_OK=0
+              else
+                OUT_OK=1
+              fi
+              break
+            fi
+            sleep 15
+          done
+          echo "ok=$OUT_OK" >> "$GITHUB_OUTPUT"
+
+      - name: Fusionner si tout est vert
+        if: steps.pr.outputs.number != '' && steps.checks.outputs.ok == '1'
         env:
-          GITHUB_TOKEN: ${{ secrets.AUTO_MERGE_TOKEN }}
-          MERGE_METHOD: merge
-          MERGE_REMOVE_LABELS: automerge
-          MERGE_COMMIT_MESSAGE: pull-request-title
-          MERGE_FORKS: false
-          MERGE_DELETE_BRANCH_ON_CLOSE: false
-          UPDATE_METHOD: rebase
+          GH_TOKEN: ${{ secrets.AUTO_MERGE_TOKEN }}
+        run: |
+          PR="${{ steps.pr.outputs.number }}"
+          DRAFT=$(gh pr view "$PR" --repo "$REPO" --json isDraft --jq '.isDraft')
+          if [ "$DRAFT" = "true" ]; then
+            echo "PR brouillon, pas de fusion"
+            exit 0
+          fi
+          MERGEABLE=$(gh pr view "$PR" --repo "$REPO" --json mergeable --jq '.mergeable')
+          if [ "$MERGEABLE" != "MERGEABLE" ]; then
+            echo "PR non fusionnable ($MERGEABLE), intervention manuelle requise"
+            exit 0
+          fi
+          echo "Fusion de la PR #$PR"
+          gh pr merge "$PR" --repo "$REPO" --merge
