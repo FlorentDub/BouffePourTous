@@ -1,6 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 
@@ -17,10 +18,13 @@ export default function Home() {
     <main className="min-h-screen bg-cream text-ink flex flex-col">
       <header className="bg-white/80 backdrop-blur border-b border-line sticky top-0 z-20">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-          <img
+          <Image
             src="/logo.png"
             alt="BouffePourTous / FoodForAll"
-            className="h-10 md:h-14"
+            width={140}
+            height={56}
+            className="h-10 md:h-14 w-auto"
+            priority
           />
           <div
             className="inline-flex items-center rounded-full bg-primary-soft border border-line p-1"
