@@ -10,8 +10,8 @@ import type { Resource } from '../lib/types'
 import { LEGACY_TYPE_MAP } from '../lib/translate'
 
 const DefaultIcon = L.icon({
-  iconUrl: markerIconUrl.src,
-  shadowUrl: markerShadowUrl.src,
+  iconUrl: typeof markerIconUrl === 'string' ? markerIconUrl : markerIconUrl.src,
+  shadowUrl: typeof markerShadowUrl === 'string' ? markerShadowUrl : markerShadowUrl.src,
 })
 L.Marker.prototype.options.icon = DefaultIcon
 

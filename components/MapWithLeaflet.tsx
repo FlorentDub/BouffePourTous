@@ -9,8 +9,8 @@ import { useEffect } from 'react'
 
 // Fix pour icônes Leaflet par défaut
 const DefaultIcon = L.icon({
-  iconUrl: markerIconUrl.src,
-  shadowUrl: markerShadowUrl.src,
+  iconUrl: typeof markerIconUrl === 'string' ? markerIconUrl : markerIconUrl.src,
+  shadowUrl: typeof markerShadowUrl === 'string' ? markerShadowUrl : markerShadowUrl.src,
 })
 L.Marker.prototype.options.icon = DefaultIcon
 
