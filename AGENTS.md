@@ -11,10 +11,13 @@ Le travail agentique sur ce projet suit des rôles nommés :
 - **Développeur** : écrit le code, ouvre une Pull Request par ticket.
 - **QA** : revue de code, vérification, rapport d'anomalies avec priorités.
 - **UI & Accessibilité** : veille à ce que toute modification d'interface soit simple, intuitive et accessible (handicaps visuels, lecteurs d'écran, navigation clavier, contrastes). Toute PR touchant l'UI passe par sa revue.
+- **Expert en Sécurité** : veille à l'absence de faille et au respect des normes de sécurité applicables. Travaille de concert avec l'Architecte sur tout choix technologique pour y intégrer les bonnes pratiques de sécurité dès la conception (privacy by design, sécurité par défaut). Toute PR touchant les entrées utilisateur, les API, l'authentification, les données personnelles ou les dépendances passe par sa revue.
 - **DevOps** : CI, déploiement, secrets.
 - **Product Owner** (l'humain) : priorités, validation, fusion des PR.
 
-Boucle standard : besoin → issue (Tech Lead) → code (Développeur) → CI automatique → revue (QA + UI si l'interface est touchée) → validation/fusion (PO).
+Boucle standard : besoin → issue (Tech Lead) → code (Développeur) → CI automatique → revue (QA + UI si l'interface est touchée + Sécurité si les entrées/API/données sont touchées) → validation/fusion (PO).
+
+Toute décision d'architecture (nouvelle dépendance, nouveau service, changement de structure) est co-validée par l'Architecte et l'Expert en Sécurité avant implementation : l'Architecte documente le choix dans le ticket, l'Expert en Sécurité y adjoint l'analyse de risque et les exigences de sécurité.
 
 ### Règles UI & accessibilité (permanent — l'agent UI les fait respecter)
 
@@ -26,6 +29,18 @@ Boucle standard : besoin → issue (Tech Lead) → code (Développeur) → CI au
 - Langue de la page cohérente (`lang` mis à jour au changement de langue).
 - Simplicité d'abord : si une interface demande des explications, elle est trop complexe.
 - Les vérifications automatiques possibles (labels, alt, contrastes) sont à ajouter à la CI quand un outil adapté est introduit ; l'agent UI fait la revue manuelle du reste.
+
+### Règles de sécurité (permanent — l'agent Sécurité les fait respecter)
+
+- **Validation côté serveur, jamais seulement côté client** : toute entrée de `/api/ajouter` est revalidée en server-side (type, longueur, format), même si le formulaire fait une première validation. Ne jamais faire confiance au client.
+- **Assainissement des sorties** : React échappe par défaut, mais tout rendu de contenu utilisateur via `dangerouslySetInnerHTML`, `innerHTML` ou icônes Leaflet custom est interdit sans échappement explicite.
+- **Pas de secret dans le code client** : les clés Airtable vivent uniquement dans les routes API (server-side) et les variables d'environnement. Vérifier qu'aucun `process.env` sensible n'est exposé dans un composant client (`'use client'`).
+- **Données personnelles minimisées** : le formulaire public ne collecte que le strict nécessaire (lieu, horaires, contact public). La géolocalisation de l'utilisateur reste côté navigateur, n'est jamais envoyée ni stockée sans consentement explicite.
+- **Anti-abus des endpoints publics** : tout endpoint public non authentifié doit avoir une limitation de débit (rate limiting) avant mise en production à grande échelle ; documenter l'absence temporaire dans le ticket si non implémenté.
+- **Dépendances sûres** : `npm audit` à 0 vulnérabilité critique/élevée avant chaque livraison ; toute nouvelle dépendance est justifiée dans la PR et validée par l'Architecte + Sécurité.
+- **En-têtes de sécurité HTTP** : CSP, `X-Content-Type-Options`, `Referrer-Policy` configurés (Next.js headers ou Vercel) ; tout changement d'en-tête passe par la revue Sécurité.
+- **Liens externes sûrs** : `target="_blank"` toujours accompagné de `rel="noopener noreferrer"`.
+- **Signalement** : toute faille identifiée est documentée dans un ticket prioritaire avec sévérité, vecteur d'attaque et correction proposée — jamais corrigée en silence sans traçabilité.
 
 ## Stack
 
