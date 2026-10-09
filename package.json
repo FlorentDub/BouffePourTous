@@ -6,13 +6,13 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "test:e2e": "playwright test"
   },
   "dependencies": {
     "airtable": "^0.12.2",
     "leaflet": "^1.9.4",
-    "next": "^15.5.27",
+    "next": "^16.4.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-leaflet": "^5.0.0"
@@ -25,8 +25,11 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "airtable": "^0.12.2",
+    "autoprefixer": "^10.4.20",
     "eslint": "^9",
-    "eslint-config-next": "15.2.4",
+    "eslint-config-next": "^16.4.0",
+    "postcss": "^8.4.49",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

@@ -44,7 +44,12 @@ const nextConfig = {
     ]
   },
   images: {
-    domains: ['unpkg.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'unpkg.com',
+      },
+    ],
   },
 }
 
