@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "import:frigos": "npx tsx --env-file=.env.local scripts/import-frigos.ts"
   },
   "dependencies": {
     "airtable": "^0.12.2",
