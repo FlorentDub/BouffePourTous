@@ -50,7 +50,7 @@ function LocateControl({
     button.innerHTML = `◎ ${lang === 'fr' ? 'Ma position' : 'My location'}`
     button.setAttribute('aria-label', lang === 'fr' ? 'Afficher ma position sur la carte' : 'Show my location on the map')
     button.style.cssText =
-      'padding:6px 12px;background:white;border:none;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,0.3);font:inherit;font-size:14px;font-weight:500;color:#6B1E1E;cursor:pointer;'
+      'position:absolute;bottom:16px;left:12px;z-index:800;padding:8px 14px;background:white;border:none;border-radius:9999px;box-shadow:0 2px 6px rgba(0,0,0,0.3);font:inherit;font-size:14px;font-weight:500;color:#6B1E1E;cursor:pointer;'
     if (locating) {
       button.style.opacity = '0.6'
       button.disabled = true
@@ -169,7 +169,7 @@ export default function Map({ lang }: { lang: 'fr' | 'en' }) {
         ))}
       </MapContainer>
       {geoMsg && (
-        <p role="alert" className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white border border-red-200 text-red-700 text-sm rounded-xl px-4 py-2 shadow-md">
+        <p role="alert" className="absolute bottom-16 left-1/2 -translate-x-1/2 bg-white border border-red-200 text-red-700 text-sm rounded-xl px-4 py-2 shadow-md max-w-[90%] text-center">
           {geoMsg}
         </p>
       )}
