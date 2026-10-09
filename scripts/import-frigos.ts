@@ -1,8 +1,10 @@
 import { readFileSync } from 'fs'
-import { createRequire } from 'module'
+import Airtable from 'airtable'
 
 
-type FrigoSeed = {
+type ResourceType = 'banque_alimentaire' | 'frigo_communautaire' | 'repas_communautaire' | 'epicerie_communautaire'
+
+type ResourceSeed = {
   name: string
   numero: string
   rue: string
@@ -11,11 +13,21 @@ type FrigoSeed = {
   horaire: string
   conditions: string
   source: string
+  type?: string
 }
+
+const TYPES: Record<ResourceType, { fr: string; en: string }> = {
+  banque_alimentaire: { fr: 'Banque alimentaire', en: 'Food bank' },
+  frigo_communautaire: { fr: 'Frigo communautaire', en: 'Community fridge' },
+  repas_communautaire: { fr: 'Repas communautaire & soupe populaire', en: 'Community meal & soup kitchen' },
+  epicerie_communautaire: { fr: 'Épicerie communautaire', en: 'Community grocery store' },
+}
+
+const isResourceType = (value: string): value is ResourceType => value in TYPES
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
-const geocode = async (f: FrigoSeed): Promise<[number, number] | null> => {
+const geocode = async (f: ResourceSeed): Promise<[number, number] | null> => {
   const q = `${f.numero} ${f.rue}, ${f.ville}, Québec, Canada`
   const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(q)}`
   try {
@@ -33,10 +45,7 @@ const geocode = async (f: FrigoSeed): Promise<[number, number] | null> => {
   }
 }
 
-const translateType = () => ({
-  fr: 'Frigo communautaire',
-  en: 'Community fridge',
-})
+
 
 const main = async () => {
   const apiKey = process.env.AIRTABLE_API_KEY
@@ -49,10 +58,14 @@ const main = async () => {
     process.exit(1)
   }
 
-  const seeds: FrigoSeed[] = JSON.parse(
+  const frigos: ResourceSeed[] = JSON.parse(
     readFileSync('data/frigos-quebec.json', 'utf8')
+  ).map((f: ResourceSeed) => ({ ...f, type: 'frigo_communautaire' }))
+  const autres: ResourceSeed[] = JSON.parse(
+    readFileSync('data/ressources-quebec.json', 'utf8')
   )
-  console.log(`${seeds.length} frigos a importer`)
+  const seeds = [...frigos, ...autres].filter((f) => f.type && isResourceType(f.type))
+  console.log(`${seeds.length} ressources a importer (${frigos.length} frigos, ${autres.length} autres)`)
 
   const base = new Airtable({ apiKey }).base(baseId)
   const table = base(tableName)
@@ -68,9 +81,8 @@ const main = async () => {
     console.log('Purge terminee.')
   }
 
-  const type = translateType()
-  const records: Record<string, unknown>[] = []
-  const failed: FrigoSeed[] = []
+  const records: { fields: Record<string, unknown> }[] = []
+  const failed: ResourceSeed[] = []
 
   for (const f of seeds) {
     const coords = await geocode(f)
@@ -78,13 +90,14 @@ const main = async () => {
       console.warn(`  geocodage echoue: ${f.name} (${f.ville}) — ignore`)
       failed.push(f)
     } else {
+      const t = TYPES[(f.type as ResourceType)]
       records.push({
         fields: {
-          id: `frigo-${f.ville.toLowerCase().replace(/[^a-z0-9]/g, '')}-${f.rue.toLowerCase().replace(/[^a-z0-9]/g, '')}`,
+          id: `${f.type}-${f.ville.toLowerCase().replace(/[^a-z0-9]/g, '')}-${f.rue.toLowerCase().replace(/[^a-z0-9]/g, '')}`,
           name_fr: f.name,
           name_en: f.name,
-          type_fr: type.fr,
-          type_en: type.en,
+          type_fr: t.fr,
+          type_en: t.en,
           description_fr: `${f.conditions} Source: ${f.source}.`,
           description_en: `${f.conditions} Source: ${f.source}.`,
           numero: f.numero,
@@ -106,16 +119,16 @@ const main = async () => {
     await sleep(1100)
   }
 
-  console.log(`${records.length} frigos geocodes avec succes, ${failed.length} echecs`)
+  console.log(`${records.length} ressources geocodees avec succes, ${failed.length} echecs`)
 
   for (let i = 0; i < records.length; i += 10) {
     const batch = records.slice(i, i + 10)
-    await table.create(batch)
+    await table.create(batch as never)
     console.log(`  insere ${Math.min(i + 10, records.length)}/${records.length}`)
   }
 
   if (failed.length > 0) {
-    console.log('\nFrigos ignores (geocodage impossible) :')
+    console.log('\nRessources ignorees (geocodage impossible) :')
     failed.forEach((f) => console.log(`  - ${f.name} (${f.ville})`))
   }
   console.log('\nImport termine.')
