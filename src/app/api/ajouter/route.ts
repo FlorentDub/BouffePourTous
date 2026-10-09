@@ -2,25 +2,32 @@ import { NextResponse } from 'next/server'
 import { getBase, tableName } from '../../../../lib/airtable'
 import { validateNewResource } from '../../../../lib/validation'
 import { translateResource } from '../../../../lib/translate'
-import { rateLimit, getClientIp } from '../../../../lib/rateLimit'
+import { rateLimit, getClientIp, makeRateLimitCookie, checkRateLimitCookie } from '../../../../lib/rateLimit'
 import type { Resource } from '../../../../lib/types'
 
 const RATE_LIMIT_MAX = 5
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000
+const RATE_LIMIT_MIN_INTERVAL_MS = 60 * 1000
 
 export async function POST(req: Request) {
+  const ip = getClientIp(req)
   const { allowed, retryAfterSec } = rateLimit(
-    `ajouter:${getClientIp(req)}`,
+    `ajouter:${ip}`,
     RATE_LIMIT_MAX,
     RATE_LIMIT_WINDOW_MS
   )
-  if (!allowed) {
+  const cookieCheck = checkRateLimitCookie(
+    req.headers.get('cookie'),
+    RATE_LIMIT_MIN_INTERVAL_MS
+  )
+  if (!allowed || !cookieCheck.allowed) {
+    const wait = Math.max(retryAfterSec, cookieCheck.retryAfterSec)
     return NextResponse.json(
       {
         success: false,
-        error: `Trop de soumissions. Réessayez dans ${retryAfterSec} secondes.`,
+        error: `Trop de soumissions. Réessayez dans ${wait} secondes.`,
       },
-      { status: 429, headers: { 'Retry-After': String(retryAfterSec) } }
+      { status: 429, headers: { 'Retry-After': String(wait) } }
     )
   }
 
@@ -101,7 +108,15 @@ export async function POST(req: Request) {
         },
       },
     ])
-    return NextResponse.json({ success: true, id: record[0].id })
+    const cookie = makeRateLimitCookie(Date.now())
+    return NextResponse.json(
+      { success: true, id: record[0].id },
+      {
+        headers: {
+          'Set-Cookie': `bpt_rl=${cookie}; HttpOnly; Secure; SameSite=Lax; Max-Age=${Math.ceil(RATE_LIMIT_WINDOW_MS / 1000)}; Path=/`,
+        },
+      }
+    )
   } catch (error: unknown) {
     console.error('Erreur lors de la création Airtable :', error)
     const message = error instanceof Error ? error.message : String(error)
