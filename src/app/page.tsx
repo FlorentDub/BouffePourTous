@@ -12,25 +12,34 @@ export default function Home() {
   useEffect(() => {
     document.documentElement.lang = lang
   }, [lang])
+
   return (
-    <main className="min-h-screen bg-[#F8EDEB] text-[#3D2C2C] flex flex-col">
-      <header className="bg-white border-b border-[#6B1E1E]">
-        <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+    <main className="min-h-screen bg-cream text-ink flex flex-col">
+      <header className="bg-white/80 backdrop-blur border-b border-line sticky top-0 z-20">
+        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
           <img
             src="/logo.png"
             alt="BouffePourTous / FoodForAll"
-            className="h-12 md:h-16"
+            className="h-10 md:h-14"
           />
-          <div className="inline-flex items-center rounded-full bg-[#F8EDEB] border border-[#6B1E1E] p-1" role="group" aria-label={lang === 'fr' ? 'Choix de la langue' : 'Language selection'}>
+          <div
+            className="inline-flex items-center rounded-full bg-primary-soft border border-line p-1"
+            role="group"
+            aria-label={lang === 'fr' ? 'Choix de la langue' : 'Language selection'}
+          >
             <button
-              className={`px-3 py-1 rounded-full transition-colors duration-200 text-sm ${lang === 'fr' ? 'bg-[#6B1E1E] text-white' : 'text-[#6B1E1E]'}`}
+              className={`px-3 py-1 rounded-full transition-colors duration-200 text-sm font-medium ${
+                lang === 'fr' ? 'bg-primary text-white' : 'text-primary hover:bg-white'
+              }`}
               onClick={() => setLang('fr')}
               aria-pressed={lang === 'fr'}
             >
               FR
             </button>
             <button
-              className={`px-3 py-1 rounded-full transition-colors duration-200 text-sm ${lang === 'en' ? 'bg-[#6B1E1E] text-white' : 'text-[#6B1E1E]'}`}
+              className={`px-3 py-1 rounded-full transition-colors duration-200 text-sm font-medium ${
+                lang === 'en' ? 'bg-primary text-white' : 'text-primary hover:bg-white'
+              }`}
               onClick={() => setLang('en')}
               aria-pressed={lang === 'en'}
             >
@@ -41,33 +50,35 @@ export default function Home() {
       </header>
 
       <div className="flex-1 flex flex-col">
-        <section className="max-w-4xl w-full mx-auto px-4 pt-6 pb-2 text-center">
-          <h1 className="text-2xl md:text-3xl font-bold text-[#6B1E1E] mb-2">
+        <section className="max-w-5xl w-full mx-auto px-4 pt-10 pb-4 text-center">
+          <h1 className="text-3xl md:text-4xl font-bold text-primary tracking-tight mb-3">
             {lang === 'fr'
               ? 'Trouvez de la nourriture gratuite près de chez vous'
               : 'Find free food near you'}
           </h1>
-          <p className="text-base md:text-lg">
+          <p className="text-base md:text-lg text-muted max-w-2xl mx-auto">
             {lang === 'fr'
               ? 'Banques alimentaires, frigos communautaires, repas et épiceries communautaires — partout au Québec.'
               : 'Food banks, community fridges, meals and community grocery stores — across Quebec.'}
           </p>
         </section>
 
-        <section className="max-w-4xl w-full mx-auto px-4 pb-6 flex-1 flex flex-col">
-          <div className="bg-white rounded-2xl shadow-xl p-4 border border-[#6B1E1E] flex-1">
-            <h2 className="text-lg font-semibold mb-2 text-[#6B1E1E]">
+        <section className="max-w-5xl w-full mx-auto px-4 pb-6 flex-1 flex flex-col">
+          <div className="bg-white rounded-3xl shadow-lg shadow-primary/5 p-4 md:p-6 border border-line flex-1">
+            <h2 className="text-lg font-semibold mb-3 text-primary flex items-center gap-2">
+              <span aria-hidden="true" className="inline-block w-2 h-2 rounded-full bg-primary" />
               {lang === 'fr' ? 'Carte des ressources' : 'Resource map'}
             </h2>
             <Map lang={lang} />
           </div>
-          <div className="mt-4 flex flex-col items-center gap-2">
+
+          <div className="mt-8 flex flex-col items-center gap-3">
             <Link href="/ajouter" className="w-full max-w-md">
-              <button className="bg-[#6B1E1E] text-white font-medium px-4 py-3 rounded shadow hover:bg-[#842525] w-full">
+              <button className="bg-primary text-white font-medium px-6 py-3.5 rounded-full shadow-md hover:bg-primary-hover hover:shadow-lg transition-all duration-200 w-full">
                 {lang === 'fr' ? '+ Ajouter une ressource' : '+ Add a resource'}
               </button>
             </Link>
-            <p className="text-sm text-[#6B1E1E]">
+            <p className="text-sm text-muted text-center max-w-md">
               {lang === 'fr'
                 ? 'Vous connaissez un lieu qui donne de la nourriture ? Partagez-le avec la communauté.'
                 : 'Know a place that gives out food? Share it with the community.'}
@@ -76,7 +87,7 @@ export default function Home() {
         </section>
       </div>
 
-      <footer className="text-center text-sm text-[#6B1E1E] p-4 border-t border-[#6B1E1E] bg-[#F8EDEB]">
+      <footer className="text-center text-sm text-muted p-6 border-t border-line bg-white/60">
         BouffePourTous / FoodForAll © {new Date().getFullYear()} — Créé avec ❤️ au Québec
       </footer>
     </main>

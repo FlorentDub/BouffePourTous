@@ -182,49 +182,49 @@ export default function AjouterPage() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-[#F8EDEB] text-[#3D2C2C] p-6">
-        <header className="flex flex-col items-center mb-8">
-          <img src="/logo.png" alt="BouffePourTous / FoodForAll" className="h-20 mb-4" />
+      <div className="min-h-screen bg-cream text-ink min-h-screen px-4 py-8 md:px-6">
+        <header className="max-w-2xl mx-auto flex items-center justify-between gap-4 mb-10">
+          <img src="/logo.png" alt="BouffePourTous / FoodForAll" className="h-12 md:h-16" />
           <Link href="/">
-            <button className="bg-[#6B1E1E] text-white px-4 py-2 rounded hover:bg-[#842525]">
+            <button className="bg-white text-primary font-medium px-4 py-2 rounded-full border border-line hover:bg-primary-soft transition-colors">
               ← {t.backHome}
             </button>
           </Link>
         </header>
-        <p className="text-center text-green-700">{t.thanks}</p>
+        <p className="max-w-2xl mx-auto text-center text-green-700 bg-green-50 border border-green-200 rounded-3xl p-8 text-lg">{t.thanks}</p>
       </div>
     )
   }
 
-  const inputClass = 'p-2 border rounded bg-white'
+  const inputClass = 'w-full p-3 rounded-xl border border-line bg-white focus:border-primary transition-colors placeholder:text-muted/60'
 
   return (
-    <div className="min-h-screen bg-[#F8EDEB] text-[#3D2C2C] p-6">
-      <header className="flex flex-col items-center mb-8">
-        <img src="/logo.png" alt="BouffePourTous / FoodForAll" className="h-20 mb-4" />
+    <div className="min-h-screen bg-cream text-ink min-h-screen px-4 py-8 md:px-6">
+      <header className="max-w-2xl mx-auto flex items-center justify-between gap-4 mb-10">
+        <img src="/logo.png" alt="BouffePourTous / FoodForAll" className="h-12 md:h-16" />
         <Link href="/">
-          <button className="bg-[#6B1E1E] text-white px-4 py-2 rounded hover:bg-[#842525]">
+          <button className="bg-white text-primary font-medium px-4 py-2 rounded-full border border-line hover:bg-primary-soft transition-colors">
             ← {t.backHome}
           </button>
         </Link>
       </header>
 
-      <div className="max-w-3xl mx-auto">
-        <h1 className="text-2xl font-semibold mb-2 text-[#6B1E1E]">{t.identification} — {lang === 'fr' ? 'Ajouter une ressource' : 'Add a resource'}</h1>
-        <p className="text-sm text-[#6B1E1E] mb-4">{t.required}</p>
+      <div className="max-w-2xl mx-auto">
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight mb-2 text-primary">{t.identification} — {lang === 'fr' ? 'Ajouter une ressource' : 'Add a resource'}</h1>
+        <p className="text-sm text-muted mb-6">{t.required}</p>
 
         <div className="mb-6">
           <span className="text-sm block mb-1">{t.langLabel}</span>
-          <div className="inline-flex items-center rounded-full bg-white border border-[#6B1E1E] p-1">
+          <div className="inline-flex items-center rounded-full bg-primary-soft border border-line p-1">
             <button
-              className={`px-3 py-1 rounded-full transition-colors text-sm ${lang === 'fr' ? 'bg-[#6B1E1E] text-white' : 'text-[#6B1E1E]'}`}
+              className={`px-3 py-1 rounded-full transition-colors text-sm font-medium ${lang === 'fr' ? 'bg-primary text-white' : 'text-primary hover:bg-white'}`}
               onClick={() => setLang('fr')}
               type="button"
             >
               FR
             </button>
             <button
-              className={`px-3 py-1 rounded-full transition-colors text-sm ${lang === 'en' ? 'bg-[#6B1E1E] text-white' : 'text-[#6B1E1E]'}`}
+              className={`px-3 py-1 rounded-full transition-colors text-sm font-medium ${lang === 'en' ? 'bg-primary text-white' : 'text-primary hover:bg-white'}`}
               onClick={() => setLang('en')}
               type="button"
             >
@@ -233,12 +233,12 @@ export default function AjouterPage() {
           </div>
         </div>
 
-        {error && <p id="form-error" role="alert" className="text-red-600 mb-2">{error}</p>}
+        {error && <p id="form-error" role="alert" className="text-red-700 bg-red-50 border border-red-200 rounded-xl p-3 mb-4">{error}</p>}
 
         <form onSubmit={handleSubmit} className="space-y-8" noValidate aria-describedby={error ? "form-error" : undefined}>
-          <fieldset className="border border-[#6B1E1E] rounded p-4">
-            <legend className="text-lg font-medium text-[#6B1E1E]">{t.legend}</legend>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center mt-4">
+          <fieldset className="border border-line rounded-3xl bg-white p-5 md:p-6 shadow-sm">
+            <legend className="text-lg font-semibold text-primary px-2">{t.legend}</legend>
+            <div className="grid grid-cols-1 gap-4 mt-4">
               <label htmlFor="name">{t.name}</label>
               <input name="name" id="name" required placeholder={t.namePh} className={inputClass} />
               <label htmlFor="type">{t.type}</label>
@@ -253,9 +253,9 @@ export default function AjouterPage() {
             </div>
           </fieldset>
 
-          <fieldset className="border border-[#6B1E1E] rounded p-4">
-            <legend className="text-lg font-medium text-[#6B1E1E]">{t.legendCoord}</legend>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center mt-4">
+          <fieldset className="border border-line rounded-3xl bg-white p-5 md:p-6 shadow-sm">
+            <legend className="text-lg font-semibold text-primary px-2">{t.legendCoord}</legend>
+            <div className="grid grid-cols-1 gap-4 mt-4">
               <label htmlFor="numero">{t.numero}</label>
               <input name="numero" id="numero" required placeholder={t.numeroPh} value={numero} onChange={e => setNumero(e.target.value)} className={inputClass} />
               <label htmlFor="rue">{t.rue}</label>
@@ -265,17 +265,17 @@ export default function AjouterPage() {
               <label htmlFor="code-postal">{t.codePostal}</label>
               <input name="code_postal" id="code-postal" required placeholder={t.codePostalPh} value={codePostal} onChange={e => setCodePostal(e.target.value)} className={inputClass} />
               <label htmlFor="latitude">{t.latitude}</label>
-              <input name="latitude" id="latitude" value={position[0]} readOnly className="p-2 border rounded bg-gray-200 text-gray-600" />
+              <input name="latitude" id="latitude" value={position[0]} readOnly className="w-full p-3 rounded-xl border border-line bg-cream text-muted" />
               <label htmlFor="longitude">{t.longitude}</label>
-              <input name="longitude" id="longitude" value={position[1]} readOnly className="p-2 border rounded bg-gray-200 text-gray-600" />
+              <input name="longitude" id="longitude" value={position[1]} readOnly className="w-full p-3 rounded-xl border border-line bg-cream text-muted" />
             </div>
-            {geoError && <p className="text-red-600 text-sm mt-2">{geoError}</p>}
+            {geoError && <p className="text-red-700 text-sm mt-2">{geoError}</p>}
             <MapSelector position={position} setPosition={setPosition} />
           </fieldset>
 
-          <fieldset className="border border-[#6B1E1E] rounded p-4">
-            <legend className="text-lg font-medium text-[#6B1E1E]">{t.legendHoraires}</legend>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center mt-4">
+          <fieldset className="border border-line rounded-3xl bg-white p-5 md:p-6 shadow-sm">
+            <legend className="text-lg font-semibold text-primary px-2">{t.legendHoraires}</legend>
+            <div className="grid grid-cols-1 gap-4 mt-4">
               <label htmlFor="horaire">{t.horaire}</label>
               <input name="horaire" id="horaire" required placeholder={t.horairePh} className={inputClass} />
               <label htmlFor="conditions">{t.conditions}</label>
@@ -289,14 +289,14 @@ export default function AjouterPage() {
             <button
               type="button"
               onClick={() => setShowOtherLang(!showOtherLang)}
-              className="text-[#6B1E1E] underline text-sm"
+              className="text-primary underline underline-offset-4 text-sm hover:text-primary-hover"
             >
               {showOtherLang ? '−' : '+'} {t.otherLang}
             </button>
             {showOtherLang && (
-              <fieldset className="border border-[#6B1E1E] rounded p-4 mt-4">
-                <legend className="text-sm font-medium text-[#6B1E1E]">{t.otherLang}</legend>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center mt-4">
+              <fieldset className="border border-line rounded-3xl bg-white p-5 md:p-6 mt-4 shadow-sm">
+                <legend className="text-sm font-medium text-primary px-2">{t.otherLang}</legend>
+                <div className="grid grid-cols-1 gap-4 mt-4">
                   <label htmlFor="name_other">{t.nameEn}</label>
                   <input id="name_other" name={`name_${lang === 'fr' ? 'en' : 'fr'}`} className={inputClass} />
                   <label htmlFor="description_other">{t.descriptionEn}</label>
@@ -314,7 +314,7 @@ export default function AjouterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="bg-[#6B1E1E] text-white px-4 py-2 rounded w-full hover:bg-[#842525]"
+              className="bg-primary text-white font-medium px-6 py-3.5 rounded-full w-full hover:bg-primary-hover shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-60"
             >
               {loading ? t.submitting : t.submit}
             </button>
