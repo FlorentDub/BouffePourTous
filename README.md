@@ -40,6 +40,9 @@ AIRTABLE_API_KEY=your_key
 AIRTABLE_BASE_ID=your_base_id
 AIRTABLE_TABLE_NAME=Ressources alimentaires
 DEEPL_API_KEY=your_deepl_key
+RESEND_API_KEY=your_resend_key
+NOTIFICATION_EMAIL=you@example.com
+RESEND_FROM=BouffePourTous <notifications@yourdomain.com>
 ```
 
 | Variable | Description | Obligatoire |
@@ -48,8 +51,13 @@ DEEPL_API_KEY=your_deepl_key
 | `AIRTABLE_BASE_ID` | Identifiant de la base (commence par `app...`) | ✅ |
 | `AIRTABLE_TABLE_NAME` | Nom de la table | ✅ (défaut : `Ressources alimentaires`) |
 | `DEEPL_API_KEY` | Clé DeepL (offre gratuite) pour la traduction automatique des soumissions | Non — sans elle, pas de traduction auto |
+| `RESEND_API_KEY` | Clé Resend pour le courriel de notification à chaque soumission | Non — sans elle, pas de courriel |
+| `NOTIFICATION_EMAIL` | Adresse qui reçoit les notifications | Non — sans elle, pas de courriel |
+| `RESEND_FROM` | Expéditeur du courriel (domaine vérifié dans Resend) | Non — défaut : onboarding@resend.dev |
 
 La table Airtable doit contenir les colonnes : `id, name_fr, name_en, type_fr, type_en, description_fr, description_en, numero, rue, ville, code_postal, latitude, longitude, horaire_fr, horaire_en, conditions_fr, conditions_en, contact, valide, derniere_mise_a_jour`.
+
+Une deuxième table `Soumissions` journalise chaque soumission (modération) : `ressource_id, ressource_nom, type, ville, ip, user_agent, date_soumission`.
 
 ## 🛠️ Stack technique
 
