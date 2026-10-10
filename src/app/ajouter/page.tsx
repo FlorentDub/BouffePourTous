@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import MapSelector from '../../../components/MapSelector'
@@ -29,6 +29,8 @@ const LABELS = {
     longitude: 'Longitude',
     geoError: 'Adresse introuvable. Vous pouvez ajuster manuellement le curseur.',
     geoErrorTech: 'Erreur lors de la géolocalisation.',
+    reverseHint: 'Cliquez sur la carte ou déplacez le marqueur : l’adresse se remplit automatiquement.',
+    reverseError: 'Adresse introuvable pour ce point. Vous pouvez remplir l’adresse manuellement.',
     horaires: 'Horaires et conditions',
     horaire: 'Horaires *',
     horairePh: 'ex : Lundi au vendredi, 9h à 17h',
@@ -73,6 +75,8 @@ const LABELS = {
     longitude: 'Longitude',
     geoError: 'Address not found. You can adjust the marker manually.',
     geoErrorTech: 'Geolocation error.',
+    reverseHint: 'Click the map or drag the marker: the address fills in automatically.',
+    reverseError: 'No address found for this point. You can fill in the address manually.',
     horaires: 'Schedule and conditions',
     horaire: 'Schedule *',
     horairePh: 'e.g. Monday to Friday, 9am to 5pm',
@@ -112,9 +116,12 @@ export default function AjouterPage() {
   const [ville, setVille] = useState('')
   const [codePostal, setCodePostal] = useState('')
   const [geoError, setGeoError] = useState<string | null>(null)
+  const [reverseError, setReverseError] = useState<string | null>(null)
+  const positionSource = useRef<'address' | 'map'>('address')
   const t = LABELS[lang]
 
   useEffect(() => {
+    if (positionSource.current !== 'address') return
     const fullAddress = `${numero} ${rue}, ${ville}, ${codePostal}, Québec, Canada`
     const timer = setTimeout(async () => {
       if (numero || rue || ville || codePostal) {
@@ -134,6 +141,30 @@ export default function AjouterPage() {
     }, 800)
     return () => clearTimeout(timer)
   }, [numero, rue, ville, codePostal, t])
+
+  useEffect(() => {
+    if (positionSource.current !== 'map') return
+    const [lat, lon] = position
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1&accept-language=fr`)
+        const data = await res.json()
+        const a = data?.address
+        if (a) {
+          setNumero(String(a.house_number || ''))
+          setRue(String(a.road || a.pedestrian || a.footway || ''))
+          setVille(String(a.city || a.town || a.village || a.municipality || ''))
+          setCodePostal(String(a.postcode || '').split(' ')[0] || '')
+          setReverseError(null)
+        } else {
+          setReverseError(t.reverseError)
+        }
+      } catch {
+        setReverseError(t.reverseError)
+      }
+    }, 800)
+    return () => clearTimeout(timer)
+  }, [position, t])
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -179,6 +210,11 @@ export default function AjouterPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const setPosFromMap = (pos: [number, number]) => {
+    positionSource.current = 'map'
+    setPosition(pos)
   }
 
   if (submitted) {
@@ -258,20 +294,22 @@ export default function AjouterPage() {
             <legend className="text-lg font-semibold text-primary px-2">{t.legendCoord}</legend>
             <div className="grid grid-cols-1 gap-4 mt-4">
               <label htmlFor="numero">{t.numero}</label>
-              <input name="numero" id="numero" required placeholder={t.numeroPh} value={numero} onChange={e => setNumero(e.target.value)} className={inputClass} />
+              <input name="numero" id="numero" required placeholder={t.numeroPh} value={numero} onChange={e => { positionSource.current = 'address'; setNumero(e.target.value) }} className={inputClass} />
               <label htmlFor="rue">{t.rue}</label>
-              <input name="rue" id="rue" required placeholder={t.ruePh} value={rue} onChange={e => setRue(e.target.value)} className={inputClass} />
+              <input name="rue" id="rue" required placeholder={t.ruePh} value={rue} onChange={e => { positionSource.current = 'address'; setRue(e.target.value) }} className={inputClass} />
               <label htmlFor="ville">{t.ville}</label>
-              <input name="ville" id="ville" required placeholder={t.villePh} value={ville} onChange={e => setVille(e.target.value)} className={inputClass} />
+              <input name="ville" id="ville" required placeholder={t.villePh} value={ville} onChange={e => { positionSource.current = 'address'; setVille(e.target.value) }} className={inputClass} />
               <label htmlFor="code-postal">{t.codePostal}</label>
-              <input name="code_postal" id="code-postal" required placeholder={t.codePostalPh} value={codePostal} onChange={e => setCodePostal(e.target.value)} className={inputClass} />
+              <input name="code_postal" id="code-postal" required placeholder={t.codePostalPh} value={codePostal} onChange={e => { positionSource.current = 'address'; setCodePostal(e.target.value) }} className={inputClass} />
               <label htmlFor="latitude">{t.latitude}</label>
               <input name="latitude" id="latitude" value={position[0]} readOnly className="w-full p-3 rounded-xl border border-line bg-cream text-muted" />
               <label htmlFor="longitude">{t.longitude}</label>
               <input name="longitude" id="longitude" value={position[1]} readOnly className="w-full p-3 rounded-xl border border-line bg-cream text-muted" />
             </div>
             {geoError && <p className="text-red-700 text-sm mt-2">{geoError}</p>}
-            <MapSelector position={position} setPosition={setPosition} />
+            {reverseError && <p className="text-red-700 text-sm mt-2">{reverseError}</p>}
+            <p className="text-sm text-muted mt-2">{t.reverseHint}</p>
+            <MapSelector position={position} setPosition={setPosFromMap} />
           </fieldset>
 
           <fieldset className="border border-line rounded-3xl bg-white p-5 md:p-6 shadow-sm">
