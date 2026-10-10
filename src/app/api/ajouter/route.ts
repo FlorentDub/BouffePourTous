@@ -3,6 +3,7 @@ import { getBase, tableName } from '../../../../lib/airtable'
 import { validateNewResource } from '../../../../lib/validation'
 import { translateResource } from '../../../../lib/translate'
 import { rateLimit, getClientIp, makeRateLimitCookie, checkRateLimitCookie } from '../../../../lib/rateLimit'
+import { notifyNewResource } from '../../../../lib/notify'
 import type { Resource } from '../../../../lib/types'
 
 const RATE_LIMIT_MAX = 5
@@ -108,6 +109,54 @@ export async function POST(req: Request) {
         },
       },
     ])
+    const submitted: Resource = {
+      id: record[0].id,
+      customId: record[0].fields.id as string,
+      name_fr: final.name_fr,
+      name_en: final.name_en,
+      type_fr: final.type_fr,
+      type_en: final.type_en,
+      description_fr: final.description_fr,
+      description_en: final.description_en,
+      numero: final.numero,
+      rue: final.rue,
+      ville: final.ville,
+      code_postal: final.code_postal,
+      latitude: final.latitude,
+      longitude: final.longitude,
+      horaire_fr: final.horaire_fr,
+      horaire_en: final.horaire_en,
+      conditions_fr: final.conditions_fr,
+      conditions_en: final.conditions_en,
+      contact: final.contact ?? '',
+      derniere_mise_a_jour: new Date().toISOString(),
+    }
+
+    try {
+      await getBase()('Soumissions').create([
+        {
+          fields: {
+            ressource_id: submitted.customId,
+            ressource_nom: submitted.name_fr || submitted.name_en,
+            type: submitted.type_fr || submitted.type_en,
+            ville: submitted.ville,
+            ip: ip,
+            user_agent: req.headers.get('user-agent') || '',
+            date_soumission: new Date().toISOString(),
+          },
+        },
+      ])
+    } catch (logError: unknown) {
+      console.error('Erreur lors du journal Soumissions :', logError)
+    }
+
+    const userAgent = req.headers.get('user-agent') || ''
+    try {
+      await notifyNewResource(submitted, { ip, userAgent })
+    } catch (notifyError: unknown) {
+      console.error('Erreur lors de l envoi du courriel :', notifyError)
+    }
+
     const cookie = makeRateLimitCookie(Date.now())
     return NextResponse.json(
       { success: true, id: record[0].id },
