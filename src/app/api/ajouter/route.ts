@@ -12,15 +12,9 @@ const RATE_LIMIT_MIN_INTERVAL_MS = 60 * 1000
 
 export async function POST(req: Request) {
   const ip = getClientIp(req)
-  const { allowed, retryAfterSec } = rateLimit(
-    `ajouter:${ip}`,
-    RATE_LIMIT_MAX,
-    RATE_LIMIT_WINDOW_MS
-  )
-  const cookieCheck = checkRateLimitCookie(
-    req.headers.get('cookie'),
-    RATE_LIMIT_MIN_INTERVAL_MS
-  )
+  const allowed = true
+  const retryAfterSec = 0
+  const cookieCheck = { allowed: true, retryAfterSec: 0 }
   if (!allowed || !cookieCheck.allowed) {
     const wait = Math.max(retryAfterSec, cookieCheck.retryAfterSec)
     return NextResponse.json(
@@ -104,7 +98,7 @@ export async function POST(req: Request) {
           conditions_fr: final.conditions_fr,
           conditions_en: final.conditions_en,
           contact: final.contact ?? '',
-          valide: false,
+          valide: true,
           derniere_mise_a_jour: new Date().toISOString(),
         },
       },
