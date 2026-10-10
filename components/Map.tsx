@@ -7,7 +7,7 @@ import markerIconUrl from 'leaflet/dist/images/marker-icon.png'
 import markerShadowUrl from 'leaflet/dist/images/marker-shadow.png'
 import { useEffect, useState } from 'react'
 import type { Resource } from '../lib/types'
-import { LEGACY_TYPE_MAP, TYPE_MAP } from '../lib/translate'
+import { LEGACY_TYPE_MAP } from '../lib/translate'
 
 const DefaultIcon = L.icon({
   iconUrl: typeof markerIconUrl === 'string' ? markerIconUrl : markerIconUrl.src,
@@ -27,21 +27,6 @@ const normalizeType = (value: string | undefined, lang: 'fr' | 'en'): string => 
   const legacy = LEGACY_TYPE_MAP[value]
   if (legacy) return lang === 'fr' ? legacy.fr : legacy.en
   return value
-}
-
-
-const resolveTypeKey = (r: Resource): string => {
-  const fr = (r.type_fr || '').trim()
-  const en = (r.type_en || '').trim()
-  for (const [key, labels] of Object.entries(TYPE_MAP)) {
-    if (fr === labels.fr || en === labels.en) return key
-  }
-  for (const [label, labels] of Object.entries(LEGACY_TYPE_MAP)) {
-    if (fr === label || en === label) {
-      return Object.entries(TYPE_MAP).find(([, v]) => v === labels)?.[0] ?? ''
-    }
-  }
-  return ''
 }
 
 const pick = (fr: string | undefined, en: string | undefined) => {
@@ -94,32 +79,17 @@ function FlyTo({ target }: { target: [number, number] | null }) {
   return null
 }
 
-export default function Map({ lang }: { lang: 'fr' | 'en' }) {
-  const [resources, setResources] = useState<Resource[]>([])
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
+export default function Map({
+  lang,
+  resources,
+}: {
+  lang: 'fr' | 'en'
+  resources: Resource[]
+}) {
   const [userPos, setUserPos] = useState<[number, number] | null>(null)
   const [flyTarget, setFlyTarget] = useState<[number, number] | null>(null)
   const [locating, setLocating] = useState(false)
   const [geoMsg, setGeoMsg] = useState<string | null>(null)
-  const [activeType, setActiveType] = useState<string | null>(null)
-
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const res = await fetch('/api/ressources')
-        if (!res.ok) throw new Error(`Erreur serveur: ${res.status}`)
-        const data = await res.json()
-        setResources(data)
-      } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : 'Une erreur est survenue'
-        setError(message)
-      } finally {
-        setLoading(false)
-      }
-    }
-    load()
-  }, [])
 
   const handleLocate = () => {
     if (!('geolocation' in navigator)) {
@@ -147,42 +117,8 @@ export default function Map({ lang }: { lang: 'fr' | 'en' }) {
     )
   }
 
-  const typeKeys = Object.keys(TYPE_MAP)
-  const counts: Record<string, number> = {}
-  for (const r of resources) {
-    const key = resolveTypeKey(r)
-    if (key) counts[key] = (counts[key] || 0) + 1
-  }
-  const filtered = activeType ? resources.filter((r) => resolveTypeKey(r) === activeType) : resources
-
-  if (loading) return <p className="text-center mt-4">{lang === 'fr' ? 'Chargement de la carte...' : 'Loading map...'}</p>
-  if (error) return <p className="text-red-600 text-center mt-4">{error}</p>
-
   return (
-    <div>
-      <div className="flex flex-wrap gap-2 mb-3" role="group" aria-label={lang === 'fr' ? 'Filtrer par type de ressource' : 'Filter by resource type'}>
-        <button
-          className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors duration-200 ${activeType === null ? 'bg-primary text-white border-primary' : 'bg-white text-primary border-line hover:border-primary'}`}
-          onClick={() => setActiveType(null)}
-          aria-pressed={activeType === null}
-        >
-          {lang === 'fr' ? 'Tous' : 'All'} ({resources.length})
-        </button>
-        {typeKeys.map((key) => {
-          const label = lang === 'fr' ? TYPE_MAP[key].fr : TYPE_MAP[key].en
-          return (
-            <button
-              key={key}
-              className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors duration-200 ${activeType === key ? 'bg-primary text-white border-primary' : 'bg-white text-primary border-line hover:border-primary'}`}
-              onClick={() => setActiveType(activeType === key ? null : key)}
-              aria-pressed={activeType === key}
-            >
-              {label} ({counts[key] || 0})
-            </button>
-          )
-        })}
-      </div>
-      <div className="h-[500px] w-full relative">
+    <div className="h-[500px] w-full relative">
       <MapContainer center={[46.8139, -71.2082]} zoom={13} scrollWheelZoom={true} className="h-full w-full rounded-xl shadow">
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
@@ -195,7 +131,7 @@ export default function Map({ lang }: { lang: 'fr' | 'en' }) {
             <Popup>{lang === 'fr' ? 'Vous êtes ici' : 'You are here'}</Popup>
           </Marker>
         )}
-        {filtered.map((r) => (
+        {resources.map((r) => (
           <Marker key={r.id} position={[r.latitude, r.longitude]}>
             <Popup>
               <div className="text-sm">
@@ -204,7 +140,7 @@ export default function Map({ lang }: { lang: 'fr' | 'en' }) {
                 <p className="mt-1">{pick(r.description_fr, r.description_en)}</p>
                 <p className="mt-2">
                   📍 {[r.numero, r.rue].filter(Boolean).join(' ')}<br />
-                  🕒 {pick(r.horaire_fr, r.horaire_en)}<br />
+                  🕑 {pick(r.horaire_fr, r.horaire_en)}<br />
                   🚨 {pick(r.conditions_fr, r.conditions_en)}<br />
                   🔗 {r.contact && (
                     <a href={r.contact} target="_blank" rel="noopener noreferrer" className="underline text-blue-600">
@@ -222,7 +158,6 @@ export default function Map({ lang }: { lang: 'fr' | 'en' }) {
           {geoMsg}
         </p>
       )}
-      </div>
     </div>
   )
 }

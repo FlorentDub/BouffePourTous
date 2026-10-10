@@ -179,3 +179,43 @@ test.describe('Filtre par type', () => {
     await expect(markers).toHaveCount(2)
   })
 })
+
+test.describe('Mode liste', () => {
+  test('le basculeur carte/liste affiche la liste des ressources', async ({ page }) => {
+    await page.route('**/api/ressources', (route) =>
+      route.fulfill({
+        contentType: 'application/json',
+        body: JSON.stringify([
+          {
+            id: 'e2e-1',
+            name_fr: 'Frigo de test',
+            name_en: 'Test fridge',
+            type_fr: 'Frigo communautaire',
+            type_en: 'Community fridge',
+            description_fr: 'Frigo test',
+            description_en: 'Test fridge',
+            numero: '123',
+            rue: 'rue Saint-Joseph',
+            ville: 'Québec',
+            latitude: 46.8139,
+            longitude: -71.2082,
+            horaire_fr: '24/7',
+            horaire_en: '24/7',
+            conditions_fr: 'Aucune',
+            conditions_en: 'None',
+          },
+        ]),
+      })
+    )
+    await page.goto('/')
+
+    const switchListe = page.getByRole('button', { name: /^Liste/ })
+    await expect(switchListe).toBeVisible()
+    await switchListe.click()
+
+    const item = page.getByRole('button', { name: /Frigo de test/ })
+    await expect(item).toBeVisible()
+    await item.click()
+    await expect(page.getByText('24/7')).toBeVisible()
+  })
+})
