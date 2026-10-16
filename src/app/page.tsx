@@ -104,11 +104,6 @@ export default function Home() {
               ? 'Trouvez de la nourriture gratuite près de chez vous'
               : 'Find free food near you'}
           </h1>
-          <p className="text-base md:text-lg text-muted max-w-2xl mx-auto">
-            {lang === 'fr'
-              ? 'Banques alimentaires, frigos communautaires, repas et épiceries communautaires — partout au Québec.'
-              : 'Food banks, community fridges, meals and community grocery stores — across Quebec.'}
-          </p>
         </section>
 
         <section className="max-w-5xl w-full mx-auto px-4 pb-6 flex-1 flex flex-col">
