@@ -1,6 +1,8 @@
 name: Import des ressources Airtable
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
     inputs:
       purge:
@@ -35,7 +37,7 @@ jobs:
           if [ "${{ inputs.purge }}" = "true" ]; then
             ARGS="--purge"
           fi
-          npx tsx --env-file=/dev/null scripts/import-frigos.ts $ARGS
+          npx tsx scripts/import-frigos.ts $ARGS
         env:
           AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
           AIRTABLE_BASE_ID: ${{ secrets.AIRTABLE_BASE_ID }}
