@@ -14,6 +14,8 @@ type ResourceSeed = {
   conditions: string
   source: string
   type?: string
+  latitude?: number
+  longitude?: number
 }
 
 const TYPES: Record<ResourceType, { fr: string; en: string }> = {
@@ -64,6 +66,12 @@ const main = async () => {
   const autres: ResourceSeed[] = JSON.parse(
     readFileSync('data/ressources-quebec.json', 'utf8')
   )
+  const geocodes: ResourceSeed[] = JSON.parse(
+    readFileSync('data/frigos-geocodes.json', 'utf8')
+  )
+  const coordsByName = new Map(
+    geocodes.map((g) => [g.name, [g.latitude, g.longitude] as [number, number]])
+  )
   const seeds = [...frigos, ...autres].filter((f) => f.type && isResourceType(f.type))
   console.log(`${seeds.length} ressources a importer (${frigos.length} frigos, ${autres.length} autres)`)
 
@@ -97,7 +105,7 @@ const main = async () => {
   const failed: ResourceSeed[] = []
 
   for (const f of toInsert) {
-    const coords = await geocode(f)
+    const coords = coordsByName.get(f.name) ?? (await geocode(f))
     if (!coords) {
       console.warn(`  geocodage echoue: ${f.name} (${f.ville}) — ignore`)
       failed.push(f)
