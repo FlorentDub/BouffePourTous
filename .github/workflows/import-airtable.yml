@@ -1,0 +1,42 @@
+name: Import des ressources Airtable
+
+on:
+  workflow_dispatch:
+    inputs:
+      purge:
+        description: "Purger la table avant l'import (defaut: non)"
+        required: false
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+
+concurrency:
+  group: import-airtable
+  cancel-in-progress: false
+
+jobs:
+  import:
+    name: Import des ressources dans Airtable
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Installer les dependances
+        run: npm ci --no-audit --no-fund
+      - name: Importer les ressources
+        run: |
+          ARGS=""
+          if [ "${{ inputs.purge }}" = "true" ]; then
+            ARGS="--purge"
+          fi
+          npx tsx --env-file=/dev/null scripts/import-frigos.ts $ARGS
+        env:
+          AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
+          AIRTABLE_BASE_ID: ${{ secrets.AIRTABLE_BASE_ID }}
+          AIRTABLE_TABLE_NAME: ${{ secrets.AIRTABLE_TABLE_NAME }}

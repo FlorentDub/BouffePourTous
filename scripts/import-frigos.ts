@@ -70,9 +70,21 @@ const main = async () => {
   const base = new Airtable({ apiKey }).base(baseId)
   const table = base(tableName)
 
+  const existing = await table.select().all()
+  const existingKeys = new Set(
+    existing.map((r) => `${(r.fields.name_fr as string) || ''}|${(r.fields.ville as string) || ''}`)
+  )
+  const toInsert = seeds.filter(
+    (f) => !existingKeys.has(`${f.name}|${f.ville}`)
+  )
+  console.log(`${toInsert.length} nouvelles ressources (${seeds.length - toInsert.length} deja presentes, ignorees)`)
+  if (toInsert.length === 0) {
+    console.log('Rien a importer. Termine.')
+    return
+  }
+
   if (purge) {
     console.log('Purge des entrees existantes...')
-    const existing = await table.select().all()
     const ids = existing.map((r) => r.id)
     for (let i = 0; i < ids.length; i += 10) {
       await table.destroy(ids.slice(i, i + 10))
@@ -84,7 +96,7 @@ const main = async () => {
   const records: { fields: Record<string, unknown> }[] = []
   const failed: ResourceSeed[] = []
 
-  for (const f of seeds) {
+  for (const f of toInsert) {
     const coords = await geocode(f)
     if (!coords) {
       console.warn(`  geocodage echoue: ${f.name} (${f.ville}) — ignore`)

@@ -13,6 +13,8 @@ Le site BouffePourTous est une carte collaborative des ressources d'aide aliment
 
 - [Accueil / carte des ressources](${SITE_URL}): carte et liste des ressources alimentaires validées, avec filtres par type et bascule FR/EN.
 - [Ajouter une ressource](${SITE_URL}/ajouter): formulaire public pour soumettre une nouvelle ressource (validée avant publication).
+- [Ressources par ville](${SITE_URL}/villes): index des pages villes.
+- [Page exemple](${SITE_URL}/ville/quebec): ressources alimentaires d'une ville, rendues en HTML statique.
 
 ## Données
 
